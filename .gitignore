@@ -10,7 +10,8 @@
 !.yarn/releases
 !.yarn/versions
 
-echo "projectdotai-1121b8ce5008.json" >> .gitignore
+# Google Cloud credentials
+projectdotai-*.json
 
 # testing
 /coverage
