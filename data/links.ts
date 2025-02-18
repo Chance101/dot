@@ -2,13 +2,10 @@
 
 export const importantLinks = {
   // Professional
-  blog: "https://your-blog.com",
+  blog: "https://conversatingclaude.x",
   linkedin: "https://www.linkedin.com/in/chasehitchens",
   github: "https://github.com/Chance101",
-  portfolio: "https://your-portfolio.com",
-  
-  // WordPress Blog (if different from main blog)
-  wordpressBlog: "https://your-wordpress-site.com",
+
   
   // Projects (if you want to maintain any static project links)
   projects: {
