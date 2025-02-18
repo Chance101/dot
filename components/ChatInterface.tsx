@@ -23,7 +23,6 @@ function messageReducer(state: MessageType[], action: MessageAction): MessageTyp
   }
 }
 
-// Memoized message formatting function
 const FormatMessageContent = React.memo(({ content }: { content: string }) => {
   return content.split('\n\n').map((paragraph, index) => (
     <p key={index} className={index > 0 ? 'mt-4' : ''}>
@@ -32,11 +31,13 @@ const FormatMessageContent = React.memo(({ content }: { content: string }) => {
   ));
 });
 
-export default function ChatInterface() {
+FormatMessageContent.displayName = 'FormatMessageContent';
+
+const ChatInterface = () => {
   const [messages, dispatch] = useReducer(messageReducer, [{
     id: '1',
     type: 'bot',
-    content: "Hi! I'm a Dot. And I'm Chase's AI bot. How may I assist you today?",
+    content: "Hi! I'm Dot. And I'm Chase's AI bot. How may I assist you today?",
     timestamp: new Date()
   }]);
   
@@ -46,7 +47,6 @@ export default function ChatInterface() {
   const currentBotMessage = useRef('');
   const abortControllerRef = useRef<AbortController | null>(null);
 
-  // Optimized scroll with RAF and debounce
   const scrollToBottom = () => {
     requestAnimationFrame(() => {
       messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -57,7 +57,6 @@ export default function ChatInterface() {
     scrollToBottom();
   }, [messages]);
 
-  // Cleanup effect
   useEffect(() => {
     return () => {
       if (abortControllerRef.current) {
@@ -95,17 +94,18 @@ export default function ChatInterface() {
           content: currentBotMessage.current 
         });
       }
-    } catch (error) {
-      if (error.name === 'AbortError') return;
-      console.error('Error in getBotResponse:', error);
-      throw error;
+    } catch (err) {
+      if (err instanceof Error) {
+        if (err.name === 'AbortError') return;
+        console.error('Error in getBotResponse:', err);
+      }
+      throw err;
     }
   };
 
   const handleSend = async () => {
     if (!input.trim() || isLoading) return;
 
-    // Abort any existing request
     if (abortControllerRef.current) {
       abortControllerRef.current.abort();
     }
@@ -132,7 +132,7 @@ export default function ChatInterface() {
 
       dispatch({ type: 'ADD_MESSAGE', message: botMessage });
       await getBotResponse(input);
-    } catch (error) {
+    } catch (err) {
       dispatch({
         type: 'ADD_MESSAGE',
         message: {
@@ -204,4 +204,8 @@ export default function ChatInterface() {
       </div>
     </div>
   );
-}
+};
+
+ChatInterface.displayName = 'ChatInterface';
+
+export default ChatInterface;

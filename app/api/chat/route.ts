@@ -6,6 +6,12 @@ import { getBlogPosts } from '@/services/wordpress';
 import { importantLinks } from '@/data';
 import { headers } from 'next/headers';
 
+interface ContextData {
+  resume: Record<string, unknown>;
+  blogPosts: Record<string, unknown>[];
+  links: Record<string, string>;
+}
+
 if (!process.env.ANTHROPIC_API_KEY) {
   throw new Error('ANTHROPIC_API_KEY is not set in environment variables');
 }
@@ -15,11 +21,11 @@ const anthropic = new Anthropic({
 });
 
 // Add caching for context data
-let cachedContext: any = null;
-let lastCacheTime: number = 0;
+let cachedContext: ContextData | null = null;
+let lastCacheTime = 0;
 const CACHE_DURATION = 5 * 60 * 1000; // 5 minutes
 
-async function getContext() {
+async function getContext(): Promise<ContextData> {
   const now = Date.now();
   if (cachedContext && (now - lastCacheTime < CACHE_DURATION)) {
     return cachedContext;
@@ -112,19 +118,25 @@ export async function POST(request: Request) {
         'Transfer-Encoding': 'chunked'
       },
     });
-  } catch (error: any) {
+  } catch (error) {
     console.error('Streaming error:', error);
     
-    // More detailed error handling
-    if (error.name === 'AbortError') {
+    if (error instanceof Error) {
+      if (error.name === 'AbortError') {
+        return NextResponse.json(
+          { error: 'Request was aborted' },
+          { status: 499 } // Client Closed Request
+        );
+      }
+      
       return NextResponse.json(
-        { error: 'Request was aborted' },
-        { status: 499 } // Client Closed Request
+        { error: 'Failed to process your request', details: error.message },
+        { status: 500 }
       );
     }
     
     return NextResponse.json(
-      { error: 'Failed to process your request', details: error.message },
+      { error: 'An unknown error occurred' },
       { status: 500 }
     );
   }
