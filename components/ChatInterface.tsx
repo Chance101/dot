@@ -131,7 +131,7 @@ const ChatInterface = () => {
 
       dispatch({ type: 'ADD_MESSAGE', message: botMessage });
       await getBotResponse(input);
-    } catch (_) {
+    } catch {
       dispatch({
         type: 'ADD_MESSAGE',
         message: {
