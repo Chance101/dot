@@ -2,7 +2,7 @@
 
 export const importantLinks = {
   // Professional
-  blog: "https://conversatingclaude.x",
+  blog: "https://conversatingclaude.xyz",
   linkedin: "https://www.linkedin.com/in/chasehitchens",
   github: "https://github.com/Chance101",
 
