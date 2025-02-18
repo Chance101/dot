@@ -66,7 +66,8 @@ const ChatInterface = () => {
   }, []);
 
   const getBotResponse = async (input: string): Promise<void> => {
-    abortControllerRef.current = new AbortController();
+
+abortControllerRef.current = new AbortController();
     
     try {
       const response = await fetch('/api/chat', {
@@ -95,13 +96,10 @@ const ChatInterface = () => {
         });
       }
     } catch (err) {
-      if (err instanceof Error) {
-        if (err.name === 'AbortError') return;
-        console.error('Error in getBotResponse:', err);
-      }
+      console.error('Error in getBotResponse:', err);
       throw err;
     }
-  };
+
 
   const handleSend = async () => {
     if (!input.trim() || isLoading) return;
