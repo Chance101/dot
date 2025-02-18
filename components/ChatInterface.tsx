@@ -1,65 +1,102 @@
 // components/ChatInterface.tsx
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useReducer, useRef, useEffect, useState } from 'react';
 import { Send, User, Bot } from 'lucide-react';
 import { MessageType } from '../types/chat';
 
+type MessageAction = 
+  | { type: 'ADD_MESSAGE'; message: MessageType }
+  | { type: 'UPDATE_LAST_BOT_MESSAGE'; content: string };
+
+function messageReducer(state: MessageType[], action: MessageAction): MessageType[] {
+  switch (action.type) {
+    case 'ADD_MESSAGE':
+      return [...state, action.message];
+    case 'UPDATE_LAST_BOT_MESSAGE':
+      const lastMessage = state[state.length - 1];
+      if (lastMessage.type !== 'bot') return state;
+      return [
+        ...state.slice(0, -1),
+        { ...lastMessage, content: action.content }
+      ];
+    default:
+      return state;
+  }
+}
+
+// Memoized message formatting function
+const FormatMessageContent = React.memo(({ content }: { content: string }) => {
+  return content.split('\n\n').map((paragraph, index) => (
+    <p key={index} className={index > 0 ? 'mt-4' : ''}>
+      {paragraph}
+    </p>
+  ));
+});
+
 export default function ChatInterface() {
-  const [messages, setMessages] = useState<MessageType[]>([
-    {
-      id: '1',
-      type: 'bot',
-      content: "Hi! I'm a Dot. And I'm Chase's AI bot. How may I assist you today?",
-      timestamp: new Date()
-    }
-  ]);
+  const [messages, dispatch] = useReducer(messageReducer, [{
+    id: '1',
+    type: 'bot',
+    content: "Hi! I'm a Dot. And I'm Chase's AI bot. How may I assist you today?",
+    timestamp: new Date()
+  }]);
+  
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const currentBotMessage = useRef('');
+  const abortControllerRef = useRef<AbortController | null>(null);
 
+  // Optimized scroll with RAF and debounce
   const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+    requestAnimationFrame(() => {
+      messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+    });
   };
 
   useEffect(() => {
     scrollToBottom();
   }, [messages]);
 
-  // Function to format message content with proper paragraphs
-  const formatMessageContent = (content: string) => {
-    return content.split('\n\n').map((paragraph, index) => (
-      <p key={index} className={index > 0 ? 'mt-4' : ''}>
-        {paragraph}
-      </p>
-    ));
-  };
+  // Cleanup effect
+  useEffect(() => {
+    return () => {
+      if (abortControllerRef.current) {
+        abortControllerRef.current.abort();
+      }
+    };
+  }, []);
 
-  const getBotResponse = async (input: string, onChunk: (chunk: string) => void): Promise<void> => {
+  const getBotResponse = async (input: string): Promise<void> => {
+    abortControllerRef.current = new AbortController();
+    
     try {
       const response = await fetch('/api/chat', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ message: input }),
+        signal: abortControllerRef.current.signal
       });
 
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
+      if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
 
       const reader = response.body?.getReader();
-      if (!reader) {
-        throw new Error('No reader available');
-      }
+      if (!reader) throw new Error('No reader available');
 
       const decoder = new TextDecoder();
+      
       while (true) {
         const { done, value } = await reader.read();
         if (done) break;
+        
         const chunk = decoder.decode(value);
-        onChunk(chunk);
+        currentBotMessage.current += chunk;
+        dispatch({ 
+          type: 'UPDATE_LAST_BOT_MESSAGE', 
+          content: currentBotMessage.current 
+        });
       }
     } catch (error) {
+      if (error.name === 'AbortError') return;
       console.error('Error in getBotResponse:', error);
       throw error;
     }
@@ -68,6 +105,11 @@ export default function ChatInterface() {
   const handleSend = async () => {
     if (!input.trim() || isLoading) return;
 
+    // Abort any existing request
+    if (abortControllerRef.current) {
+      abortControllerRef.current.abort();
+    }
+
     const userMessage: MessageType = {
       id: Date.now().toString(),
       type: 'user',
@@ -75,9 +117,10 @@ export default function ChatInterface() {
       timestamp: new Date()
     };
 
-    setMessages(prev => [...prev, userMessage]);
+    dispatch({ type: 'ADD_MESSAGE', message: userMessage });
     setInput('');
     setIsLoading(true);
+    currentBotMessage.current = '';
 
     try {
       const botMessage: MessageType = {
@@ -87,29 +130,18 @@ export default function ChatInterface() {
         timestamp: new Date()
       };
 
-      setMessages(prev => [...prev, botMessage]);
-
-      await getBotResponse(input, (chunk) => {
-        setMessages(prev => {
-          const lastMessage = prev[prev.length - 1];
-          if (lastMessage.type === 'bot') {
-            return [
-              ...prev.slice(0, -1),
-              { ...lastMessage, content: lastMessage.content + chunk }
-            ];
-          }
-          return prev;
-        });
-      });
+      dispatch({ type: 'ADD_MESSAGE', message: botMessage });
+      await getBotResponse(input);
     } catch (error) {
-      console.error('Error getting bot response:', error);
-      const errorMessage: MessageType = {
-        id: (Date.now() + 1).toString(),
-        type: 'bot',
-        content: "I apologize, but I'm having trouble processing your request. Please try again.",
-        timestamp: new Date()
-      };
-      setMessages(prev => [...prev, errorMessage]);
+      dispatch({
+        type: 'ADD_MESSAGE',
+        message: {
+          id: (Date.now() + 1).toString(),
+          type: 'bot',
+          content: "I apologize, but I'm having trouble processing your request. Please try again.",
+          timestamp: new Date()
+        }
+      });
     } finally {
       setIsLoading(false);
     }
@@ -138,7 +170,7 @@ export default function ChatInterface() {
                     : 'bg-gray-100'
                 }`}
               >
-                {message.type === 'bot' ? formatMessageContent(message.content) : message.content}
+                <FormatMessageContent content={message.content} />
               </div>
               {message.type === 'user' && (
                 <div className="w-8 h-8 rounded-full bg-gray-300 flex items-center justify-center">

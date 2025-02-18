@@ -4,6 +4,7 @@ import Anthropic from '@anthropic-ai/sdk';
 import { getResume } from '@/services/googleDocs';
 import { getBlogPosts } from '@/services/wordpress';
 import { importantLinks } from '@/data';
+import { headers } from 'next/headers';
 
 if (!process.env.ANTHROPIC_API_KEY) {
   throw new Error('ANTHROPIC_API_KEY is not set in environment variables');
@@ -13,29 +14,55 @@ const anthropic = new Anthropic({
   apiKey: process.env.ANTHROPIC_API_KEY,
 });
 
-export async function POST(request: Request) {
-  const { message } = await request.json();
+// Add caching for context data
+let cachedContext: any = null;
+let lastCacheTime: number = 0;
+const CACHE_DURATION = 5 * 60 * 1000; // 5 minutes
 
-  if (!message) {
+async function getContext() {
+  const now = Date.now();
+  if (cachedContext && (now - lastCacheTime < CACHE_DURATION)) {
+    return cachedContext;
+  }
+
+  const [resume, blogPosts] = await Promise.all([
+    getResume(),
+    getBlogPosts()
+  ]);
+
+  cachedContext = {
+    resume,
+    blogPosts,
+    links: importantLinks
+  };
+  
+  lastCacheTime = now;
+  return cachedContext;
+}
+
+export async function POST(request: Request) {
+  const headersList = await headers();
+  
+  // Add basic request validation
+  if (headersList.get('content-type')?.toLowerCase() !== 'application/json') {
     return NextResponse.json(
-      { error: 'Message is required' },
-      { status: 400 }
+      { error: 'Content-Type must be application/json' },
+      { status: 415 }
     );
   }
 
   try {
-    // Fetch both resume and blog posts
-    const [resume, blogPosts] = await Promise.all([
-      getResume(),
-      getBlogPosts()
-    ]);
+    const { message } = await request.json();
 
-    // Create context object
-    const context = {
-      resume,
-      blogPosts,
-      links: importantLinks
-    };
+    if (!message) {
+      return NextResponse.json(
+        { error: 'Message is required' },
+        { status: 400 }
+      );
+    }
+
+    // Get cached context
+    const context = await getContext();
 
     const stream = await anthropic.messages.create({
       model: "claude-3-opus-20240229",
@@ -82,12 +109,22 @@ export async function POST(request: Request) {
         'Content-Type': 'text/event-stream',
         'Cache-Control': 'no-cache',
         'Connection': 'keep-alive',
+        'Transfer-Encoding': 'chunked'
       },
     });
-  } catch (error: Error | unknown) {
+  } catch (error: any) {
     console.error('Streaming error:', error);
+    
+    // More detailed error handling
+    if (error.name === 'AbortError') {
+      return NextResponse.json(
+        { error: 'Request was aborted' },
+        { status: 499 } // Client Closed Request
+      );
+    }
+    
     return NextResponse.json(
-      { error: 'Failed to process your request' },
+      { error: 'Failed to process your request', details: error.message },
       { status: 500 }
     );
   }
