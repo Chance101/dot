@@ -3,8 +3,17 @@
 import { useState, useEffect } from 'react';
 import { getBlogPosts } from '@/services/wordpress';
 
+// Define the BlogPost interface based on your WordPress data structure
+interface BlogPost {
+  id: string | number;
+  title: string;
+  date: string;
+  excerpt: string;
+  url: string;
+}
+
 export default function TestPage() {
-  const [posts, setPosts] = useState<any[]>([]);
+  const [posts, setPosts] = useState<BlogPost[]>([]); // Fixed type here
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 

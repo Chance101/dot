@@ -1,4 +1,4 @@
-// app/api/chat/route.ts
+// app/api/chat/route.ts (and route copy.ts)
 import { NextResponse } from 'next/server';
 import Anthropic from '@anthropic-ai/sdk';
 import { getResume } from '@/services/googleDocs';
@@ -50,11 +50,11 @@ export async function POST(request: Request) {
      
       When presenting multiple items or points, format them like this:
 
-• First point here\n\n• Second point here\n\n• Third point here\n\n• Fourth point here
+- First point here\n\n• Second point here\n\n• Third point here\n\n• Fourth point here
 
       You can discuss: 
 
-• Chase's professional experience and skills\n\n• Chase's AI experiments & projects\n\n• Chase's AI blog\n\n• A daily joke
+- Chase's professional experience and skills\n\n• Chase's AI experiments & projects\n\n• Chase's AI blog\n\n• A daily joke
       
       Be friendly and helpful while maintaining professionalism.`,
       messages: [{ role: "user", content: message }],
@@ -84,7 +84,7 @@ export async function POST(request: Request) {
         'Connection': 'keep-alive',
       },
     });
-  } catch (error: any) {
+  } catch (error: Error | unknown) {    // This is the only line that changed
     console.error('Streaming error:', error);
     return NextResponse.json(
       { error: 'Failed to process your request' },
@@ -92,4 +92,3 @@ export async function POST(request: Request) {
     );
   }
 }
-
