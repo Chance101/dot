@@ -1,4 +1,4 @@
-// app/api/chat/route.ts (and route copy.ts)
+// app/api/chat/route.ts
 import { NextResponse } from 'next/server';
 import Anthropic from '@anthropic-ai/sdk';
 import { getResume } from '@/services/googleDocs';
@@ -66,7 +66,7 @@ export async function POST(request: Request) {
       async start(controller) {
         try {
           for await (const part of stream) {
-            if (part.type === 'content_block_delta' && part.delta?.text) {
+            if (part.type === 'content_block_delta' && 'text' in part.delta) {
               controller.enqueue(encoder.encode(part.delta.text));
             }
           }
@@ -84,7 +84,7 @@ export async function POST(request: Request) {
         'Connection': 'keep-alive',
       },
     });
-  } catch (error: Error | unknown) {    // This is the only line that changed
+  } catch (error: Error | unknown) {
     console.error('Streaming error:', error);
     return NextResponse.json(
       { error: 'Failed to process your request' },
