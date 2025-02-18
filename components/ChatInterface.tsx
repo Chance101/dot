@@ -1,3 +1,5 @@
+'use client';
+
 // components/ChatInterface.tsx
 import React, { useReducer, useRef, useEffect, useState } from 'react';
 import { Send, User, Bot } from 'lucide-react';
