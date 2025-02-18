@@ -6,10 +6,20 @@ import { getBlogPosts } from '@/services/wordpress';
 import { importantLinks } from '@/data';
 import { headers } from 'next/headers';
 
+interface Links {
+  blog: string;
+  linkedin: string;
+  github: string;
+  projects: {
+    project1: string;
+    project2: string;
+  };
+}
+
 interface ContextData {
   resume: Record<string, unknown>;
   blogPosts: Record<string, unknown>[];
-  links: Record<string, string>;
+  links: Links;
 }
 
 if (!process.env.ANTHROPIC_API_KEY) {
@@ -141,3 +151,4 @@ export async function POST(request: Request) {
     );
   }
 }
+
