@@ -69,7 +69,7 @@ const ChatInterface = () => {
 
   const getBotResponse = async (input: string): Promise<void> => {
     abortControllerRef.current = new AbortController();
-    let streamTimeout: NodeJS.Timeout;
+    let streamTimeout: NodeJS.Timeout | undefined;
     
     try {
       const response = await fetch('/api/chat', {
@@ -109,7 +109,7 @@ const ChatInterface = () => {
             content: currentBotMessage.current 
           });
         } finally {
-          clearTimeout(streamTimeout);
+          if (streamTimeout) clearTimeout(streamTimeout);
         }
       }
     } catch (err) {
@@ -238,3 +238,4 @@ const ChatInterface = () => {
 ChatInterface.displayName = 'ChatInterface';
 
 export default ChatInterface;
+
