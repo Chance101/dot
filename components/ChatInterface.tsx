@@ -91,13 +91,16 @@ const ChatInterface = () => {
     abortControllerRef.current = new AbortController();
     let streamTimeout: NodeJS.Timeout | undefined;
     let accumulatedContent = '';
+    let lastUpdateTime = Date.now();
+    const IDLE_TIMEOUT = 20000; // 20 seconds
     
     try {
       const response = await fetch('/api/chat', {
         method: 'POST',
         headers: { 
           'Content-Type': 'application/json',
-          'Accept': 'text/event-stream',
+          'Cache-Control': 'no-cache',
+          'Connection': 'keep-alive',
         },
         body: JSON.stringify({ message: input }),
         signal: abortControllerRef.current.signal
@@ -107,7 +110,7 @@ const ChatInterface = () => {
       if (!response.body) throw new Error('No response body available');
 
       const reader = response.body.getReader();
-      const decoder = new TextDecoder();
+      const decoder = new TextDecoder('utf-8');
 
       let isFirstChunk = true;
       let retryCount = 0;
@@ -115,10 +118,15 @@ const ChatInterface = () => {
       
       while (true) {
         try {
+          // Check if we've been idle too long
+          if (Date.now() - lastUpdateTime > IDLE_TIMEOUT) {
+            throw new Error('Response timeout - no data received for too long');
+          }
+
           const timeoutPromise = new Promise((_, reject) => {
             streamTimeout = setTimeout(() => {
-              reject(new Error('Stream timeout'));
-            }, 15000); // Increased timeout to 15 seconds
+              reject(new Error('Chunk timeout'));
+            }, 30000); // Increased to 30 seconds for chunk timeout
           });
 
           const readResult = await Promise.race([
@@ -131,13 +139,17 @@ const ChatInterface = () => {
             break;
           }
 
-          const chunk = decoder.decode(readResult.value);
+          const chunk = decoder.decode(readResult.value, { stream: true });
           
           // Reset retry count on successful chunk
           retryCount = 0;
+          lastUpdateTime = Date.now();
           
           // Skip empty chunks
           if (!chunk.trim()) continue;
+          
+          // Log chunk for debugging
+          console.log('Received chunk:', chunk.length, 'bytes');
 
           accumulatedContent += chunk;
           currentBotMessage.current = accumulatedContent;
