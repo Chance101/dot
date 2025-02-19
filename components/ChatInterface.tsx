@@ -90,51 +90,89 @@ const ChatInterface = () => {
   const getBotResponse = async (input: string): Promise<void> => {
     abortControllerRef.current = new AbortController();
     let streamTimeout: NodeJS.Timeout | undefined;
+    let accumulatedContent = '';
     
     try {
       const response = await fetch('/api/chat', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 
+          'Content-Type': 'application/json',
+          'Accept': 'text/event-stream',
+        },
         body: JSON.stringify({ message: input }),
         signal: abortControllerRef.current.signal
       });
 
       if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+      if (!response.body) throw new Error('No response body available');
 
-      const reader = response.body?.getReader();
-      if (!reader) throw new Error('No reader available');
-
+      const reader = response.body.getReader();
       const decoder = new TextDecoder();
+
+      let isFirstChunk = true;
+      let retryCount = 0;
+      const MAX_RETRIES = 3;
       
       while (true) {
-        const timeoutPromise = new Promise((_, reject) => {
-          streamTimeout = setTimeout(() => {
-            reject(new Error('Stream timeout'));
-          }, 10000);
-        });
-
         try {
+          const timeoutPromise = new Promise((_, reject) => {
+            streamTimeout = setTimeout(() => {
+              reject(new Error('Stream timeout'));
+            }, 15000); // Increased timeout to 15 seconds
+          });
+
           const readResult = await Promise.race([
             reader.read(),
             timeoutPromise
           ]) as { done: boolean; value: Uint8Array };
 
-          if (readResult.done) break;
-          
+          if (readResult.done) {
+            console.log('Stream complete');
+            break;
+          }
+
           const chunk = decoder.decode(readResult.value);
-          currentBotMessage.current += chunk;
-          dispatch({ 
-            type: 'UPDATE_LAST_BOT_MESSAGE', 
-            content: currentBotMessage.current 
+          
+          // Reset retry count on successful chunk
+          retryCount = 0;
+          
+          // Skip empty chunks
+          if (!chunk.trim()) continue;
+
+          accumulatedContent += chunk;
+          currentBotMessage.current = accumulatedContent;
+          
+          dispatch({
+            type: 'UPDATE_LAST_BOT_MESSAGE',
+            content: currentBotMessage.current
           });
+
+          // If this is the first chunk, we can clear the isFirstChunk flag
+          if (isFirstChunk) {
+            isFirstChunk = false;
+          }
+        } catch (error) {
+          console.error('Error reading chunk:', error);
+          
+          // Increment retry count and check if we should keep trying
+          retryCount++;
+          if (retryCount >= MAX_RETRIES) {
+            throw new Error('Max retries exceeded');
+          }
+          
+          // Wait before retrying
+          await new Promise(resolve => setTimeout(resolve, 1000));
+          continue;
         } finally {
-          if (streamTimeout) clearTimeout(streamTimeout);
+          if (streamTimeout) {
+            clearTimeout(streamTimeout);
+          }
         }
       }
     } catch (err) {
       if (err instanceof Error) {
         if (err.name === 'AbortError') return;
-        if (err.message === 'Stream timeout') {
+        if (err.message === 'Stream timeout' || err.message === 'Max retries exceeded') {
           currentBotMessage.current += '\n\n[Message was interrupted. Please try again.]';
           dispatch({
             type: 'UPDATE_LAST_BOT_MESSAGE',
