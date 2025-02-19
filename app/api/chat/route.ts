@@ -1,7 +1,9 @@
 // app/api/chat/route.ts
 import { NextResponse } from 'next/server';
 import Anthropic from '@anthropic-ai/sdk';
+import { getBlogPosts } from '@/services/wordpress';
 import { importantLinks } from '@/data';
+import { getResume } from '@/services/googleDocs';
 
 if (!process.env.ANTHROPIC_API_KEY) {
   throw new Error('ANTHROPIC_API_KEY is not set in environment variables');
@@ -10,8 +12,6 @@ if (!process.env.ANTHROPIC_API_KEY) {
 const anthropic = new Anthropic({
   apiKey: process.env.ANTHROPIC_API_KEY,
 });
-
-export const runtime = 'edge';
 
 export async function POST(request: Request) {
   const { message } = await request.json();
@@ -24,13 +24,16 @@ export async function POST(request: Request) {
   }
 
   try {
-    // Fetch resume from the new API route
-    const resumeResponse = await fetch(`${process.env.NEXT_PUBLIC_APP_URL}/api/resume`);
-    const { resume } = await resumeResponse.json();
+    // Fetch both resume and blog posts
+    const [resume, blogPosts] = await Promise.all([
+      getResume(),
+      getBlogPosts()
+    ]);
 
     // Create context object
     const context = {
       resume,
+      blogPosts,
       links: importantLinks
     };
 
