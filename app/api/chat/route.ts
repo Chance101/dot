@@ -1,9 +1,9 @@
 // app/api/chat/route.ts
 import { NextResponse } from 'next/server';
 import Anthropic from '@anthropic-ai/sdk';
+import { getResume } from '@/services/googleDocs';
 import { getBlogPosts } from '@/services/wordpress';
 import { importantLinks } from '@/data';
-import { getResume } from '@/services/googleDocs';
 
 if (!process.env.ANTHROPIC_API_KEY) {
   throw new Error('ANTHROPIC_API_KEY is not set in environment variables');
@@ -70,9 +70,11 @@ export async function POST(request: Request) {
               controller.enqueue(encoder.encode(part.delta.text));
             }
           }
+          // Send an explicit end marker
           controller.enqueue(encoder.encode('\n'));
           controller.close();
         } catch (error) {
+          console.error('Stream error:', error);
           controller.error(error);
         }
       },
@@ -81,7 +83,7 @@ export async function POST(request: Request) {
     return new Response(readable, {
       headers: {
         'Content-Type': 'text/event-stream',
-        'Cache-Control': 'no-cache',
+        'Cache-Control': 'no-cache, no-transform',
         'Connection': 'keep-alive',
       },
     });

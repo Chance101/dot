@@ -1,23 +1,23 @@
 'use client';
 
-import React, { useReducer, useRef, useEffect, useState } from 'react';
+import React, { useReducer, useRef, useEffect, useState, useCallback } from 'react';
 import { Send, User, Bot } from 'lucide-react';
 import { MessageType } from '../types/chat';
 
 type MessageAction = 
   | { type: 'ADD_MESSAGE'; message: MessageType }
-  | { type: 'UPDATE_LAST_BOT_MESSAGE'; content: string };
+  | { type: 'APPEND_TO_LAST_MESSAGE'; content: string };
 
 function messageReducer(state: MessageType[], action: MessageAction): MessageType[] {
   switch (action.type) {
     case 'ADD_MESSAGE':
       return [...state, action.message];
-    case 'UPDATE_LAST_BOT_MESSAGE':
+    case 'APPEND_TO_LAST_MESSAGE':
       const lastMessage = state[state.length - 1];
       if (lastMessage.type !== 'bot') return state;
       return [
         ...state.slice(0, -1),
-        { ...lastMessage, content: action.content }
+        { ...lastMessage, content: lastMessage.content + action.content }
       ];
     default:
       return state;
@@ -49,27 +49,28 @@ const ChatInterface = () => {
   const chatContainerRef = useRef<HTMLDivElement>(null);
   const currentBotMessage = useRef('');
   const abortControllerRef = useRef<AbortController | null>(null);
+  const streamComplete = useRef<boolean>(false);
 
-  const scrollToBottom = () => {
+  const scrollToBottom = useCallback(() => {
     if (shouldAutoScroll) {
       requestAnimationFrame(() => {
         messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
       });
     }
-  };
+  }, [shouldAutoScroll]);
 
-  const handleScroll = () => {
+  const handleScroll = useCallback(() => {
     if (!chatContainerRef.current) return;
     
     const { scrollTop, scrollHeight, clientHeight } = chatContainerRef.current;
     const isNearBottom = scrollHeight - (scrollTop + clientHeight) < 100;
     
     setShouldAutoScroll(isNearBottom);
-  };
+  }, []);
 
   useEffect(() => {
     scrollToBottom();
-  }, [messages, shouldAutoScroll]);
+  }, [messages, scrollToBottom]);
 
   useEffect(() => {
     const chatContainer = chatContainerRef.current;
@@ -77,22 +78,26 @@ const ChatInterface = () => {
       chatContainer.addEventListener('scroll', handleScroll);
       return () => chatContainer.removeEventListener('scroll', handleScroll);
     }
+  }, [handleScroll]);
+
+  const cleanupStream = useCallback(() => {
+    if (abortControllerRef.current) {
+      abortControllerRef.current.abort();
+      abortControllerRef.current = null;
+    }
+    streamComplete.current = false;
+    setIsLoading(false);
   }, []);
 
   useEffect(() => {
     return () => {
-      if (abortControllerRef.current) {
-        abortControllerRef.current.abort();
-      }
+      cleanupStream();
     };
-  }, []);
+  }, [cleanupStream]);
 
   const getBotResponse = async (input: string): Promise<void> => {
+    streamComplete.current = false;
     abortControllerRef.current = new AbortController();
-    let streamTimeout: NodeJS.Timeout | undefined;
-    let accumulatedContent = '';
-    let lastUpdateTime = Date.now();
-    const IDLE_TIMEOUT = 20000; // 20 seconds
     
     try {
       const response = await fetch('/api/chat', {
@@ -112,100 +117,53 @@ const ChatInterface = () => {
       const reader = response.body.getReader();
       const decoder = new TextDecoder('utf-8');
 
-      let isFirstChunk = true;
-      let retryCount = 0;
-      const MAX_RETRIES = 3;
-      
-      while (true) {
-        try {
-          // Check if we've been idle too long
-          if (Date.now() - lastUpdateTime > IDLE_TIMEOUT) {
-            throw new Error('Response timeout - no data received for too long');
-          }
+      while (!streamComplete.current) {
+        const { done, value } = await reader.read();
 
-          const timeoutPromise = new Promise((_, reject) => {
-            streamTimeout = setTimeout(() => {
-              reject(new Error('Chunk timeout'));
-            }, 30000); // Increased to 30 seconds for chunk timeout
-          });
-
-          const readResult = await Promise.race([
-            reader.read(),
-            timeoutPromise
-          ]) as { done: boolean; value: Uint8Array };
-
-          if (readResult.done) {
-            console.log('Stream complete');
-            break;
-          }
-
-          const chunk = decoder.decode(readResult.value, { stream: true });
-          
-          // Reset retry count on successful chunk
-          retryCount = 0;
-          lastUpdateTime = Date.now();
-          
-          // Skip empty chunks
-          if (!chunk.trim()) continue;
-          
-          // Log chunk for debugging
-          console.log('Received chunk:', chunk.length, 'bytes');
-
-          accumulatedContent += chunk;
-          currentBotMessage.current = accumulatedContent;
-          
-          dispatch({
-            type: 'UPDATE_LAST_BOT_MESSAGE',
-            content: currentBotMessage.current
-          });
-
-          // If this is the first chunk, we can clear the isFirstChunk flag
-          if (isFirstChunk) {
-            isFirstChunk = false;
-          }
-        } catch (error) {
-          console.error('Error reading chunk:', error);
-          
-          // Increment retry count and check if we should keep trying
-          retryCount++;
-          if (retryCount >= MAX_RETRIES) {
-            throw new Error('Max retries exceeded');
-          }
-          
-          // Wait before retrying
-          await new Promise(resolve => setTimeout(resolve, 1000));
-          continue;
-        } finally {
-          if (streamTimeout) {
-            clearTimeout(streamTimeout);
-          }
+        if (done) {
+          streamComplete.current = true;
+          break;
         }
+
+        const chunk = decoder.decode(value, { stream: true });
+        
+        // Check for the end marker
+        if (chunk.includes('[DONE]')) {
+          streamComplete.current = true;
+          break;
+        }
+
+        if (chunk.trim()) {
+          dispatch({
+            type: 'APPEND_TO_LAST_MESSAGE',
+            content: chunk.replace('[DONE]', '')
+          });
+        }
+      }
+
+      // Final cleanup
+      if (reader) {
+        await reader.cancel();
       }
     } catch (err) {
       if (err instanceof Error) {
-        if (err.name === 'AbortError') return;
-        if (err.message === 'Stream timeout' || err.message === 'Max retries exceeded') {
-          currentBotMessage.current += '\n\n[Message was interrupted. Please try again.]';
-          dispatch({
-            type: 'UPDATE_LAST_BOT_MESSAGE',
-            content: currentBotMessage.current
-          });
+        if (err.name === 'AbortError') {
+          console.log('Stream aborted');
           return;
         }
+        console.error('Error in getBotResponse:', err);
       }
-      console.error('Error in getBotResponse:', err);
       throw err;
     } finally {
-      clearTimeout(streamTimeout);
+      streamComplete.current = true;
+      setIsLoading(false);
     }
   };
 
   const handleSend = async () => {
     if (!input.trim() || isLoading) return;
 
-    if (abortControllerRef.current) {
-      abortControllerRef.current.abort();
-    }
+    cleanupStream();
 
     const userMessage: MessageType = {
       id: Date.now().toString(),
@@ -229,7 +187,8 @@ const ChatInterface = () => {
 
       dispatch({ type: 'ADD_MESSAGE', message: botMessage });
       await getBotResponse(input);
-    } catch {
+    } catch (error) {
+      console.error('Error in handleSend:', error);
       dispatch({
         type: 'ADD_MESSAGE',
         message: {
