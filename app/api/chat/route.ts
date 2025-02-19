@@ -13,6 +13,8 @@ const anthropic = new Anthropic({
   apiKey: process.env.ANTHROPIC_API_KEY,
 });
 
+export const runtime = 'edge';
+
 export async function POST(request: Request) {
   const { message } = await request.json();
 
@@ -24,13 +26,11 @@ export async function POST(request: Request) {
   }
 
   try {
-    // Fetch both resume and blog posts
     const [resume, blogPosts] = await Promise.all([
       getResume(),
       getBlogPosts()
     ]);
 
-    // Create context object
     const context = {
       resume,
       blogPosts,
@@ -39,7 +39,7 @@ export async function POST(request: Request) {
 
     const stream = await anthropic.messages.create({
       model: "claude-3-opus-20240229",
-      max_tokens: 1024,
+      max_tokens: 2048,  // Increased from 1024 to 2048
       system: `You are Chase's personal AI assistant, and you are communicating with a stranger as a chatbot. The user does not necessarily know Chase. Through interacting with you, the user is able to learn about and get more information about Chase. You have access to the following information:
       ${JSON.stringify(context, null, 2)}
       
@@ -67,11 +67,9 @@ export async function POST(request: Request) {
         try {
           for await (const part of stream) {
             if (part.type === 'content_block_delta' && 'text' in part.delta) {
-              const chunk = part.delta.text;
-              controller.enqueue(encoder.encode(chunk));
+              controller.enqueue(encoder.encode(part.delta.text));
             }
           }
-          // Send an empty chunk to signal completion
           controller.enqueue(encoder.encode('\n'));
           controller.close();
         } catch (error) {
