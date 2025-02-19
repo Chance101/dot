@@ -30,7 +30,7 @@ export async function fetchBlogPosts() {
 
   try {
     const response = await fetch(
-      'https://public-api.wordpress.com/wp/v2/sites/chasehitchens.wordpress.com/posts',
+      'https://public-api.wordpress.com/wp/v2/sites/conversatingclaude.wordpress.com/posts',
       {
         headers: {
           'Accept': 'application/json',
