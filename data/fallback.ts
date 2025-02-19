@@ -9,21 +9,32 @@ export const resumeData = {
     linkedin: "LinkedIn" // Add your actual LinkedIn URL in links.ts
   },
 
-  summary: `2x Presidents Club winning Account Executive with 10+ years of experience in quota-carrying roles, specializing in full-cycle sales, account management, and customer success. Proven track record in driving revenue, while building strong customer relationships through consultative sales and innovative strategies, succeeding in both complex corporate and fast-paced startup environments. Curious-minded, seeking constant learning and growth with a passion for sales, customer success, and digital technology.`,
+  summary: `Chase is a business leader, a customer success advocate, a manager of people, an entrepreneur, an AI student with a rapidly growing expertise, and a tech lover (especlly health tech). He has over 15 years of professional experience having worked for companies like General Electric (GE), Jawbone (tech), Whole Foods Market, and as a founder of his own company, Matcha Project.`,
 
   skills: [
-    "Full-Cycle Sales & Pipeline Management",
-    "Prospecting",
-    "Closing",
+    "Full-Cycle Sales"
+     "Pipeline Management"
     "Cross-Team Collaboration",
-    "Customer Journey & Success",
+    "Customer Success"
+    "the Customer Journey"
+	"Customer Service"
+	"Customer Experience",
     "Salesforce CRM",
     "High EQ",
     "Proactive Learner & Tinkerer",
     "Data Analysis",
-    "Creative Thinker",
+    "Creative & Outside of the Box Thinker",
     "Adaptable",
     "Positive Energy"
+	"AI"
+	"Building with AI"
+	"Chatbots"
+	"Curious"
+	"People Management"
+	"Sales"
+	"Marketing"
+	"Merchandising"
+	"
   ],
 
   experience: [
