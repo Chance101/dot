@@ -98,17 +98,16 @@ const ChatInterface = () => {
           const readResult = await Promise.race([
             reader.read(),
             timeoutPromise
-          ]);
+          ]) as ReadableStreamDefaultReadResult<Uint8Array>;
 
-          if ('done' in readResult && readResult.done) break;
-          if ('value' in readResult) {
-            const chunk = decoder.decode(readResult.value);
-            currentBotMessage.current += chunk;
-            dispatch({ 
-              type: 'UPDATE_LAST_BOT_MESSAGE', 
-              content: currentBotMessage.current 
-            });
-          }
+          if (readResult.done) break;
+          
+          const chunk = decoder.decode(readResult.value);
+          currentBotMessage.current += chunk;
+          dispatch({ 
+            type: 'UPDATE_LAST_BOT_MESSAGE', 
+            content: currentBotMessage.current 
+          });
         } finally {
           clearTimeout(streamTimeout);
         }
