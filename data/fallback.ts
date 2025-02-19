@@ -12,12 +12,12 @@ export const resumeData = {
   summary: `Chase is a business leader, a customer success advocate, a manager of people, an entrepreneur, an AI student with a rapidly growing expertise, and a tech lover (especlly health tech). He has over 15 years of professional experience having worked for companies like General Electric (GE), Jawbone (tech), Whole Foods Market, and as a founder of his own company, Matcha Project.`,
 
   skills: [
-    "Full-Cycle Sales"
-     "Pipeline Management"
+    "Full-Cycle Sales",
+     "Pipeline Management",
     "Cross-Team Collaboration",
-    "Customer Success"
-    "the Customer Journey"
-	"Customer Service"
+    "Customer Success",
+    "the Customer Journey",
+	"Customer Service",
 	"Customer Experience",
     "Salesforce CRM",
     "High EQ",
@@ -25,16 +25,16 @@ export const resumeData = {
     "Data Analysis",
     "Creative & Outside of the Box Thinker",
     "Adaptable",
-    "Positive Energy"
-	"AI"
-	"Building with AI"
-	"Chatbots"
-	"Curious"
-	"People Management"
-	"Sales"
-	"Marketing"
+    "Positive Energy",
+	"AI",
+	"Building with AI",
+	"Chatbots",
+	"Curious",
+	"People Management",
+	"Sales",
+	"Marketing",
 	"Merchandising"
-	"
+	
   ],
 
   experience: [
