@@ -5,6 +5,8 @@ import { getResume } from '@/services/googleDocs';
 import { getBlogPosts } from '@/services/wordpress';
 import { importantLinks } from '@/data';
 
+export const runtime = 'edge';
+
 if (!process.env.ANTHROPIC_API_KEY) {
   throw new Error('ANTHROPIC_API_KEY is not set in environment variables');
 }
