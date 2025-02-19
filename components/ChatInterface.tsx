@@ -98,7 +98,7 @@ const ChatInterface = () => {
           const readResult = await Promise.race([
             reader.read(),
             timeoutPromise
-          ]) as ReadableStreamDefaultReadResult<Uint8Array>;
+          ]) as { done: boolean; value: Uint8Array };
 
           if (readResult.done) break;
           
