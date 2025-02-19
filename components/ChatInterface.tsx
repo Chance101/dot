@@ -69,6 +69,7 @@ const ChatInterface = () => {
 
   const getBotResponse = async (input: string): Promise<void> => {
     abortControllerRef.current = new AbortController();
+    let streamTimeout: NodeJS.Timeout;
     
     try {
       const response = await fetch('/api/chat', {
@@ -86,19 +87,49 @@ const ChatInterface = () => {
       const decoder = new TextDecoder();
       
       while (true) {
-        const { done, value } = await reader.read();
-        if (done) break;
-        
-        const chunk = decoder.decode(value);
-        currentBotMessage.current += chunk;
-        dispatch({ 
-          type: 'UPDATE_LAST_BOT_MESSAGE', 
-          content: currentBotMessage.current 
+        // Set a timeout for each chunk
+        const timeoutPromise = new Promise((_, reject) => {
+          streamTimeout = setTimeout(() => {
+            reject(new Error('Stream timeout'));
+          }, 10000); // 10 second timeout
         });
+
+        try {
+          const readResult = await Promise.race([
+            reader.read(),
+            timeoutPromise
+          ]);
+
+          if ('done' in readResult && readResult.done) break;
+          if ('value' in readResult) {
+            const chunk = decoder.decode(readResult.value);
+            currentBotMessage.current += chunk;
+            dispatch({ 
+              type: 'UPDATE_LAST_BOT_MESSAGE', 
+              content: currentBotMessage.current 
+            });
+          }
+        } finally {
+          clearTimeout(streamTimeout);
+        }
       }
     } catch (err) {
+      if (err instanceof Error) {
+        if (err.name === 'AbortError') return;
+        if (err.message === 'Stream timeout') {
+          // Handle timeout by appending a message
+          currentBotMessage.current += '\n\n[Message was interrupted. Please try again.]';
+          dispatch({
+            type: 'UPDATE_LAST_BOT_MESSAGE',
+            content: currentBotMessage.current
+          });
+          return;
+        }
+      }
       console.error('Error in getBotResponse:', err);
       throw err;
+    } finally {
+      clearTimeout(streamTimeout);
     }
   };
 
