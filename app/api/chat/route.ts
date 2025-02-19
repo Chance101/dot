@@ -1,8 +1,6 @@
 // app/api/chat/route.ts
 import { NextResponse } from 'next/server';
 import Anthropic from '@anthropic-ai/sdk';
-import { getResume } from '@/services/googleDocs';
-import { getBlogPosts } from '@/services/wordpress';
 import { importantLinks } from '@/data';
 
 if (!process.env.ANTHROPIC_API_KEY) {
@@ -26,20 +24,19 @@ export async function POST(request: Request) {
   }
 
   try {
-    const [resume, blogPosts] = await Promise.all([
-      getResume(),
-      getBlogPosts()
-    ]);
+    // Fetch resume from the new API route
+    const resumeResponse = await fetch(`${process.env.NEXT_PUBLIC_APP_URL}/api/resume`);
+    const { resume } = await resumeResponse.json();
 
+    // Create context object
     const context = {
       resume,
-      blogPosts,
       links: importantLinks
     };
 
     const stream = await anthropic.messages.create({
       model: "claude-3-opus-20240229",
-      max_tokens: 2048,  // Increased from 1024 to 2048
+      max_tokens: 2048,
       system: `You are Chase's personal AI assistant, and you are communicating with a stranger as a chatbot. The user does not necessarily know Chase. Through interacting with you, the user is able to learn about and get more information about Chase. You have access to the following information:
       ${JSON.stringify(context, null, 2)}
       
