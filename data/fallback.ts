@@ -9,7 +9,7 @@ export const resumeData = {
     linkedin: "LinkedIn" // Add your actual LinkedIn URL in links.ts
   },
 
-  summary: `Chase is a business leader, a customer success advocate, a manager of people, an entrepreneur, an AI student with a rapidly growing expertise, and a tech lover (especlly health tech). He has over 15 years of professional experience having worked for companies like General Electric (GE), Jawbone (tech), Whole Foods Market, and as a founder of his own company, Matcha Project.`,
+  summary: `Chase is a business leader, a customer success advocate, a manager of people, an entrepreneur, has a rapidly growing expertise in AI -- pushing the boundaries of LLMs and leveraging AI to build utility, and is a tech lover (consumer health tech). He has over 15 years of professional experience having worked for companies like General Electric (GE), Jawbone (tech), Whole Foods Market, and as a founder of his own company, Matcha Project.`,
 
   skills: [
     "Full-Cycle Sales",
