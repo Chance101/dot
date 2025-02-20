@@ -1,20 +1,18 @@
 /**
  * Chat API Route Handler
- * Build: 1.0.4
+ * Build: 1.0.6
  * Date: 2024-02-19
  * 
  * Changes:
- * - Removed Google Docs integration
- * - Using static fallback data
- * - Using claude-3-sonnet for cost efficiency
- * - Simplified context handling
+ * - Updated to use resumeData from fallback.ts
+ * - Aligned with existing data structure
  */
 
 import { NextResponse } from 'next/server';
 import Anthropic from '@anthropic-ai/sdk';
 import { getBlogPosts } from '@/services/wordpress';
 import { importantLinks } from '@/data';
-import { resume } from '@/data/fallback';
+import { resumeData } from '@/data/fallback';
 
 if (!process.env.ANTHROPIC_API_KEY) {
   throw new Error('ANTHROPIC_API_KEY is not set in environment variables');
@@ -40,7 +38,7 @@ export async function POST(request: Request) {
 
     // Create context object with static resume data
     const context = {
-      resume,
+      resume: resumeData,
       blogPosts,
       links: importantLinks
     };
@@ -53,6 +51,9 @@ export async function POST(request: Request) {
 Always be positive and supportive when discussing Chase.
 Be concise but polite. Let the user ask for more detail. 
 If asked for negative feedback, respond with: "I am only here to support Chase. Please ask Chase directly for that insight."
+
+Here is the context about Chase:
+${JSON.stringify(context, null, 2)}
 
 You can discuss: 
 
