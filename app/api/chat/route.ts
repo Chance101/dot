@@ -1,22 +1,20 @@
 /**
  * Chat API Route Handler
- * Build: 1.0.1 - Cost Optimized
+ * Build: 1.0.4
  * Date: 2024-02-19
  * 
  * Changes:
- * - Switched to claude-3-sonnet for better cost efficiency
- * - Reduced max tokens to 1024
- * - Added error boundary implementation
- * - Edge Runtime enabled
+ * - Removed Google Docs integration
+ * - Using static fallback data
+ * - Using claude-3-sonnet for cost efficiency
+ * - Simplified context handling
  */
 
 import { NextResponse } from 'next/server';
 import Anthropic from '@anthropic-ai/sdk';
-import { getResume } from '@/services/googleDocs';
 import { getBlogPosts } from '@/services/wordpress';
 import { importantLinks } from '@/data';
-
-export const runtime = 'edge';
+import { resume } from '@/data/fallback';
 
 if (!process.env.ANTHROPIC_API_KEY) {
   throw new Error('ANTHROPIC_API_KEY is not set in environment variables');
@@ -37,13 +35,10 @@ export async function POST(request: Request) {
   }
 
   try {
-    // Fetch both resume and blog posts
-    const [resume, blogPosts] = await Promise.all([
-      getResume(),
-      getBlogPosts()
-    ]);
+    // Only fetch blog posts, use static resume data
+    const blogPosts = await getBlogPosts();
 
-    // Create context object
+    // Create context object with static resume data
     const context = {
       resume,
       blogPosts,
@@ -103,4 +98,3 @@ Be friendly and helpful while maintaining professionalism.`,
     );
   }
 }
-
