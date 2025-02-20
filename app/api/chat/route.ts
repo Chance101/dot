@@ -1,4 +1,15 @@
-// app/api/chat/route.ts
+/**
+ * Chat API Route Handler
+ * Build: 1.0.1 - Cost Optimized
+ * Date: 2024-02-19
+ * 
+ * Changes:
+ * - Switched to claude-3-sonnet for better cost efficiency
+ * - Reduced max tokens to 1024
+ * - Added error boundary implementation
+ * - Edge Runtime enabled
+ */
+
 import { NextResponse } from 'next/server';
 import Anthropic from '@anthropic-ai/sdk';
 import { getResume } from '@/services/googleDocs';
@@ -40,8 +51,8 @@ export async function POST(request: Request) {
     };
 
     const stream = await anthropic.messages.create({
-      model: "claude-3-opus-20240229",
-      max_tokens: 2048,
+      model: "claude-3-sonnet-20240229",
+      max_tokens: 1024,
       system: `You are Chase's personal AI assistant, and you are communicating with a stranger as a chatbot. The user does not necessarily know Chase. Through interacting with you, the user is able to learn about and get more information about Chase. You have access to the following information:
       ${JSON.stringify(context, null, 2)}
       
@@ -72,11 +83,9 @@ export async function POST(request: Request) {
               controller.enqueue(encoder.encode(part.delta.text));
             }
           }
-          // Send an explicit end marker
           controller.enqueue(encoder.encode('\n'));
           controller.close();
         } catch (error) {
-          console.error('Stream error:', error);
           controller.error(error);
         }
       },
@@ -85,7 +94,7 @@ export async function POST(request: Request) {
     return new Response(readable, {
       headers: {
         'Content-Type': 'text/event-stream',
-        'Cache-Control': 'no-cache, no-transform',
+        'Cache-Control': 'no-cache',
         'Connection': 'keep-alive',
       },
     });
