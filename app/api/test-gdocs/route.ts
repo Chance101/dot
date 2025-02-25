@@ -1,6 +1,5 @@
 // app/api/test-gdocs/route.ts
 import { NextResponse } from 'next/server';
-import { getResume } from '@/services/googleDocs';
 
 export async function GET() {
   try {
