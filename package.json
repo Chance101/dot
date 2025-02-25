@@ -10,8 +10,6 @@
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.36.3",
-    "google-auth-library": "^9.15.1",
-    "googleapis": "^144.0.0",
     "lucide-react": "^0.474.0",
     "next": "15.1.6",
     "react": "^19.0.0",
