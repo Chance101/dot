@@ -28,7 +28,9 @@ export async function GET() {
     return NextResponse.json({
       status: 'success',
       message: 'Claude API connection successful',
-      response: response.content[0].text,
+      response: response.content[0].type === 'text' 
+      ? response.content[0].text 
+      : JSON.stringify(response.content[0]),
       credentials: {
         anthropicKey: 'Set'
       }
