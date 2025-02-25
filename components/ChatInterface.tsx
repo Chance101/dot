@@ -342,7 +342,7 @@ const ChatInterface = () => {
             <div className="w-8 h-8 rounded-full bg-blue-500 flex items-center justify-center mr-2">
               <Bot className="w-5 h-5 text-white" />
             </div>
-            <h2 className="font-medium text-gray-900 dark:text-gray-100">Chase's Assistant</h2>
+            <h2 className="font-medium text-gray-900 dark:text-gray-100">Chase&apos;s Assistant</h2>
           </div>
           <button 
             onClick={handleClearChat}
