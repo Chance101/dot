@@ -27,6 +27,9 @@ projectdotai-*.json
 .DS_Store
 *.pem
 
+# Add this line to your existing .gitignore file
+/extra/
+
 # debug
 npm-debug.log*
 yarn-debug.log*

@@ -4,9 +4,8 @@ import { resumeData } from '@/data/fallback';
 
 export async function GET() {
   try {
-    // Use resumeData directly instead of calling getResume()
-    const resume = resumeData;
-    return NextResponse.json({ resume });
+    // Simply return the static resume data
+    return NextResponse.json({ resume: resumeData });
   } catch (error) {
     console.error('Resume fetch error:', error);
     return NextResponse.json(
