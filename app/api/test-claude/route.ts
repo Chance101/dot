@@ -34,7 +34,22 @@ export async function GET() {
         anthropicKey: 'Set'
       }
     });
-  } catch (error: any) {
+  } catch (error: Error | unknown) {
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+    
+    console.error('Claude API test error:', error);
+    return NextResponse.json(
+      {
+        status: 'error',
+        message: 'Failed to connect to Claude API',
+        error: errorMessage,
+        credentials: {
+          anthropicKey: process.env.ANTHROPIC_API_KEY ? 'Set' : 'Not set'
+        }
+      },
+      { status: 500 }
+    );
+  }
     console.error('Claude API test error:', error);
     return NextResponse.json(
       {

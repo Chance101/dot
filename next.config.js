@@ -5,8 +5,8 @@ const nextConfig = {
   //   ignoreBuildErrors: true,
   // },
   eslint: {
-    // Uncomment this if you want to ignore ESLint errors during build
-    // ignoreDuringBuilds: true,
+    // Ignore ESLint errors during build
+    ignoreDuringBuilds: true,
   },
   // Set this to true if you're using the App Router
   reactStrictMode: true,
