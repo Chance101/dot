@@ -1,23 +1,22 @@
-'use client';
-
+// extra/chat-interface-fixed.ts
 import React, { useReducer, useRef, useEffect, useState, useCallback } from 'react';
 import { Send, User, Bot } from 'lucide-react';
 import { MessageType } from '../types/chat';
 
 type MessageAction = 
   | { type: 'ADD_MESSAGE'; message: MessageType }
-  | { type: 'UPDATE_LAST_BOT_MESSAGE'; content: string };
+  | { type: 'APPEND_TO_LAST_MESSAGE'; content: string };
 
 function messageReducer(state: MessageType[], action: MessageAction): MessageType[] {
   switch (action.type) {
     case 'ADD_MESSAGE':
       return [...state, action.message];
-    case 'UPDATE_LAST_BOT_MESSAGE':
+    case 'APPEND_TO_LAST_MESSAGE':
       const lastMessage = state[state.length - 1];
       if (lastMessage.type !== 'bot') return state;
       return [
         ...state.slice(0, -1),
-        { ...lastMessage, content: action.content }
+        { ...lastMessage, content: lastMessage.content + action.content }
       ];
     default:
       return state;
@@ -25,11 +24,15 @@ function messageReducer(state: MessageType[], action: MessageAction): MessageTyp
 }
 
 const FormatMessageContent = React.memo(({ content }: { content: string }) => {
-  return content.split('\n\n').map((paragraph, index) => (
-    <p key={index} className={index > 0 ? 'mt-4' : ''}>
-      {paragraph}
-    </p>
-  ));
+  return (
+    <>
+      {content.split('\n\n').map((paragraph, index) => (
+        <p key={index} className={index > 0 ? 'mt-4' : ''}>
+          {paragraph}
+        </p>
+      ))}
+    </>
+  );
 });
 
 FormatMessageContent.displayName = 'FormatMessageContent';
@@ -133,12 +136,12 @@ const ChatInterface = () => {
           break;
         }
 
-        currentBotMessage.current += chunk;
-        
-        dispatch({
-          type: 'UPDATE_LAST_BOT_MESSAGE',
-          content: currentBotMessage.current.replace('[DONE]', '')
-        });
+        if (chunk.trim()) {
+          dispatch({
+            type: 'APPEND_TO_LAST_MESSAGE',
+            content: chunk.replace('[DONE]', '')
+          });
+        }
       }
 
       // Final cleanup
