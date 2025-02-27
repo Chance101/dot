@@ -38,7 +38,7 @@ const ChatInterface = () => {
   const [messages, dispatch] = useReducer(messageReducer, [{
     id: '1',
     type: 'bot',
-    content: "Hi! I'm Chase's AI assistant. I can tell you about Chase's professional experience, AI projects, blog, or share a joke. How may I assist you today?",
+    content: "Hi! I'm Dot. And I'm Chase's AI bot. How may I assist you today?",
     timestamp: new Date()
   }]);
   
