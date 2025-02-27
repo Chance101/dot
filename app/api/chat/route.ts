@@ -44,7 +44,7 @@ export async function POST(request: Request) {
     }
 
     const stream = await anthropic.messages.create({
-      model: "claude-3-sonnet-20240229", // You may want to update this to the latest available model
+      model: "claude-3-sonnet-20240307", // Updated to the latest Claude 3 Sonnet model
       max_tokens: 1024,
       system: `You are Chase's personal AI assistant, and you are communicating with a stranger as a chatbot. The user does not necessarily know Chase. Through interacting with you, the user is able to learn about and get more information about Chase.
 
