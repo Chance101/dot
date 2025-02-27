@@ -38,7 +38,7 @@ const ChatInterface = () => {
   const [messages, dispatch] = useReducer(messageReducer, [{
     id: '1',
     type: 'bot',
-    content: "Hi! I'm Dot. And I'm Chase's AI bot. How may I assist you today?",
+    content: "Hi! I'm Chase's AI assistant. I can tell you about Chase's professional experience, AI projects, blog, or share a joke. How may I assist you today?",
     timestamp: new Date()
   }]);
   
@@ -111,7 +111,14 @@ const ChatInterface = () => {
         signal: abortControllerRef.current.signal
       });
 
-      if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+      if (!response.ok) {
+        // Try to get error message from response
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(
+          errorData.message || errorData.error || `HTTP error! status: ${response.status}`
+        );
+      }
+      
       if (!response.body) throw new Error('No response body available');
 
       const reader = response.body.getReader();
@@ -153,7 +160,13 @@ const ChatInterface = () => {
         }
         console.error('Error in getBotResponse:', err);
       }
-      throw err;
+      
+      // Return error message to be displayed to user instead of throwing
+      const errorMessage = err instanceof Error ? err.message : 'An unknown error occurred';
+      dispatch({
+        type: 'APPEND_TO_LAST_MESSAGE',
+        content: `\n\nError: ${errorMessage}. Please try again or check that your API key is valid.`
+      });
     } finally {
       streamComplete.current = true;
       setIsLoading(false);

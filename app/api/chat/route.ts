@@ -7,12 +7,11 @@ import { resumeData } from '@/data/fallback';
 
 export const runtime = 'edge';
 
-if (!process.env.ANTHROPIC_API_KEY) {
-  throw new Error('ANTHROPIC_API_KEY is not set in environment variables');
-}
+// Safely access API key
+const apiKey = process.env.ANTHROPIC_API_KEY || '';
 
 const anthropic = new Anthropic({
-  apiKey: process.env.ANTHROPIC_API_KEY,
+  apiKey: apiKey,
 });
 
 export async function POST(request: Request) {
@@ -35,9 +34,17 @@ export async function POST(request: Request) {
       blogPosts,
       links: importantLinks
     };
+    
+    // Check if API key is valid
+    if (!apiKey) {
+      return NextResponse.json(
+        { error: 'API key is missing. Please add a valid Anthropic API key to your .env.local file.' },
+        { status: 500 }
+      );
+    }
 
     const stream = await anthropic.messages.create({
-      model: "claude-3-sonnet-20240229",
+      model: "claude-3-sonnet-20240229", // You may want to update this to the latest available model
       max_tokens: 1024,
       system: `You are Chase's personal AI assistant, and you are communicating with a stranger as a chatbot. The user does not necessarily know Chase. Through interacting with you, the user is able to learn about and get more information about Chase.
 
@@ -86,8 +93,14 @@ Be friendly and helpful while maintaining professionalism.`,
     });
   } catch (error: Error | unknown) {
     console.error('Streaming error:', error);
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+    console.error('Error details:', errorMessage);
+    
     return NextResponse.json(
-      { error: 'Failed to process your request' },
+      { 
+        error: 'Failed to process your request',
+        message: errorMessage 
+      },
       { status: 500 }
     );
   }
