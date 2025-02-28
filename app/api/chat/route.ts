@@ -73,11 +73,17 @@ Be friendly and helpful while maintaining professionalism.`,
     const readable = new ReadableStream({
       async start(controller) {
         try {
+          let completeMessage = '';
+          
           for await (const part of stream) {
             if (part.type === 'content_block_delta' && 'text' in part.delta) {
-              controller.enqueue(encoder.encode(part.delta.text));
+              const text = part.delta.text;
+              completeMessage += text;
+              controller.enqueue(encoder.encode(text));
             }
           }
+          
+          // Send the complete message followed by a done marker
           controller.enqueue(encoder.encode('\n[DONE]'));
           controller.close();
         } catch (error) {

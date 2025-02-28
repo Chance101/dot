@@ -24,12 +24,10 @@ function messageReducer(state: MessageType[], action: MessageAction): MessageTyp
   }
 }
 
+import MessageFormatter from './MessageFormatter';
+
 const FormatMessageContent = React.memo(({ content }: { content: string }) => {
-  return content.split('\n\n').map((paragraph, index) => (
-    <p key={index} className={index > 0 ? 'mt-4' : ''}>
-      {paragraph}
-    </p>
-  ));
+  return <MessageFormatter content={content} />;
 });
 
 FormatMessageContent.displayName = 'FormatMessageContent';
@@ -123,6 +121,7 @@ const ChatInterface = () => {
 
       const reader = response.body.getReader();
       const decoder = new TextDecoder('utf-8');
+      let fullText = '';
 
       while (!streamComplete.current) {
         const { done, value } = await reader.read();
@@ -133,9 +132,15 @@ const ChatInterface = () => {
         }
 
         const chunk = decoder.decode(value, { stream: true });
+        fullText += chunk;
         
         // Check for the end marker
         if (chunk.includes('[DONE]')) {
+          // Don't append [DONE] to the displayed message
+          dispatch({
+            type: 'APPEND_TO_LAST_MESSAGE',
+            content: chunk.replace('[DONE]', '')
+          });
           streamComplete.current = true;
           break;
         }
@@ -143,7 +148,7 @@ const ChatInterface = () => {
         if (chunk.trim()) {
           dispatch({
             type: 'APPEND_TO_LAST_MESSAGE',
-            content: chunk.replace('[DONE]', '')
+            content: chunk
           });
         }
       }
