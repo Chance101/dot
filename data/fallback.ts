@@ -27,6 +27,8 @@ export const resumeData = {
     "Adaptable",
     "Positive Energy",
 	"AI",
+    "API",
+    "LLMs",
 	"Building with AI",
 	"Chatbots",
 	"Curious",
@@ -66,7 +68,7 @@ export const resumeData = {
       period: "March 2018 - February 2023",
       achievements: [
         "Built a direct-to-consumer (DTC) Consumer Packaged Goods (CPG) matcha tea company.",
-        "Drove sales through targeted paid ad campaigns, email marketing, content creation, and full-funnel optimization, achieving customer conversion and retention."
+        "Drove sales through targeted paid ad campaigns, email marketing, content creation, and full-funnel marketing and sales, achieving customer conversion and retention."
       ]
     },
     {
