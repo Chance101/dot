@@ -67,7 +67,8 @@ export const resumeData = {
       period: "March 2018 - February 2023",
       achievements: [
         "Built a direct-to-consumer (DTC) Consumer Packaged Goods (CPG) matcha tea company.",
-        "Drove sales through targeted paid ad campaigns, email marketing, content creation, and full-funnel marketing and sales, achieving customer conversion and retention."
+        "Drove sales through targeted paid ad campaigns, email marketing, content creation, and full-funnel marketing and sales, achieving customer conversion and retention.",
+        "In 2018, lived in Japan to study Japanese tea production at the source, learning directly from tea masters, farmers, and producers while building relationships with tea traders throughout Japan in preparation for launching the business."
       ]
     },
     {
