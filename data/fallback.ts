@@ -3,10 +3,7 @@
 export const resumeData = {
   personalInfo: {
     name: "Chase R. Hitchens",
-    location: "Austin, TX",
-    phone: "(512) 888-1150",
-    email: "Chase.Hitchens@gmail.com",
-    linkedin: "LinkedIn" // Add your actual LinkedIn URL in links.ts
+    location: "Austin, TX"
   },
 
   summary: `Chase is a business leader, a customer success advocate, a manager of people, an entrepreneur, has a rapidly growing expertise in AI -- pushing the boundaries of LLMs and leveraging AI to build utility, and is a tech lover (consumer health tech). He has over 15 years of professional experience having worked for companies like General Electric (GE), Jawbone (tech), Whole Foods Market, and as a founder of his own company, Matcha Project.`,
