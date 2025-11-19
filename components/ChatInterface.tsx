@@ -95,19 +95,27 @@ const ChatInterface = () => {
     };
   }, [cleanupStream]);
 
-  const getBotResponse = async (input: string): Promise<void> => {
+  const getBotResponse = async (input: string, messageHistory: MessageType[]): Promise<void> => {
     streamComplete.current = false;
     abortControllerRef.current = new AbortController();
-    
+
+    // Prepare history for API (exclude the empty bot message we just added)
+    const historyForApi = messageHistory
+      .filter(msg => msg.content.trim() !== '')
+      .map(msg => ({
+        type: msg.type,
+        content: msg.content
+      }));
+
     try {
       const response = await fetch('/api/chat', {
         method: 'POST',
-        headers: { 
+        headers: {
           'Content-Type': 'application/json',
           'Cache-Control': 'no-cache',
           'Connection': 'keep-alive',
         },
-        body: JSON.stringify({ message: input }),
+        body: JSON.stringify({ message: input, history: historyForApi }),
         signal: abortControllerRef.current.signal
       });
 
@@ -172,6 +180,9 @@ const ChatInterface = () => {
       timestamp: new Date()
     };
 
+    // Capture current messages + new user message for history
+    const currentHistory = [...messages, userMessage];
+
     dispatch({ type: 'ADD_MESSAGE', message: userMessage });
     setInput('');
     setIsLoading(true);
@@ -186,7 +197,7 @@ const ChatInterface = () => {
       };
 
       dispatch({ type: 'ADD_MESSAGE', message: botMessage });
-      await getBotResponse(input);
+      await getBotResponse(input, currentHistory);
     } catch (error) {
       console.error('Error in handleSend:', error);
       dispatch({

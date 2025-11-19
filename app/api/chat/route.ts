@@ -22,8 +22,13 @@ const anthropic = new Anthropic({
   apiKey: process.env.ANTHROPIC_API_KEY,
 });
 
+interface ConversationMessage {
+  role: 'user' | 'assistant';
+  content: string;
+}
+
 export async function POST(request: Request) {
-  const { message } = await request.json();
+  const { message, history = [] } = await request.json();
 
   if (!message) {
     return NextResponse.json(
@@ -31,6 +36,18 @@ export async function POST(request: Request) {
       { status: 400 }
     );
   }
+
+  // Build conversation messages from history (limit to last 10 exchanges)
+  const conversationHistory: ConversationMessage[] = history
+    .slice(-20) // Last 20 messages (10 exchanges)
+    .map((msg: { type: string; content: string }) => ({
+      role: msg.type === 'user' ? 'user' : 'assistant',
+      content: msg.content
+    }))
+    .filter((msg: ConversationMessage) => msg.content.trim() !== '');
+
+  // Add current message
+  conversationHistory.push({ role: 'user', content: message });
 
   try {
     // Only fetch blog posts, use static resume data
@@ -63,7 +80,7 @@ You can discuss:
 * A daily joke
      
 Be friendly and helpful while maintaining professionalism.`,
-      messages: [{ role: "user", content: message }],
+      messages: conversationHistory,
       stream: true,
     });
 
