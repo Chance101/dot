@@ -119,7 +119,10 @@ const ChatInterface = () => {
         signal: abortControllerRef.current.signal
       });
 
-      if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(`HTTP error! status: ${response.status}, details: ${errorData.details || 'unknown'}`);
+      }
       if (!response.body) throw new Error('No response body available');
 
       const reader = response.body.getReader();

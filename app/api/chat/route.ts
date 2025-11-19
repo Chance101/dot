@@ -115,8 +115,12 @@ Be friendly and helpful while maintaining professionalism.`,
     });
   } catch (error: Error | unknown) {
     console.error('Streaming error:', error);
+    console.error('Conversation history:', JSON.stringify(conversationHistory, null, 2));
+
+    // Return more detailed error for debugging
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
     return NextResponse.json(
-      { error: 'Failed to process your request' },
+      { error: 'Failed to process your request', details: errorMessage },
       { status: 500 }
     );
   }
