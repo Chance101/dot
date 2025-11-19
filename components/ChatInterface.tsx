@@ -180,8 +180,8 @@ const ChatInterface = () => {
       timestamp: new Date()
     };
 
-    // Capture current messages + new user message for history
-    const currentHistory = [...messages, userMessage];
+    // Capture current messages for history (don't include new message - it's sent separately)
+    const currentHistory = [...messages];
 
     dispatch({ type: 'ADD_MESSAGE', message: userMessage });
     setInput('');

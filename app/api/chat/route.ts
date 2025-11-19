@@ -38,13 +38,18 @@ export async function POST(request: Request) {
   }
 
   // Build conversation messages from history (limit to last 10 exchanges)
-  const conversationHistory: ConversationMessage[] = history
+  let conversationHistory: ConversationMessage[] = history
     .slice(-20) // Last 20 messages (10 exchanges)
     .map((msg: { type: string; content: string }) => ({
       role: msg.type === 'user' ? 'user' : 'assistant',
       content: msg.content
     }))
     .filter((msg: ConversationMessage) => msg.content.trim() !== '');
+
+  // Claude API requires first message to be from user - skip leading assistant messages
+  while (conversationHistory.length > 0 && conversationHistory[0].role === 'assistant') {
+    conversationHistory = conversationHistory.slice(1);
+  }
 
   // Add current message
   conversationHistory.push({ role: 'user', content: message });
