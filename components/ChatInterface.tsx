@@ -34,6 +34,17 @@ const FormatMessageContent = React.memo(({ content }: { content: string }) => {
 
 FormatMessageContent.displayName = 'FormatMessageContent';
 
+const ThinkingIndicator = () => (
+  <div className="flex items-center gap-1 text-gray-500 dark:text-gray-400">
+    <span>Thinking</span>
+    <span className="flex gap-0.5">
+      <span className="animate-bounce" style={{ animationDelay: '0ms' }}>.</span>
+      <span className="animate-bounce" style={{ animationDelay: '150ms' }}>.</span>
+      <span className="animate-bounce" style={{ animationDelay: '300ms' }}>.</span>
+    </span>
+  </div>
+);
+
 const ChatInterface = () => {
   const [messages, dispatch] = useReducer(messageReducer, [{
     id: '1',
@@ -243,7 +254,11 @@ const ChatInterface = () => {
                     : 'bg-gray-100 dark:bg-gray-700 text-gray-900 dark:text-gray-100'
                 }`}
               >
-                <FormatMessageContent content={message.content} />
+                {message.type === 'bot' && message.content === '' && isLoading ? (
+                  <ThinkingIndicator />
+                ) : (
+                  <FormatMessageContent content={message.content} />
+                )}
               </div>
               {message.type === 'user' && (
                 <div className="w-8 h-8 rounded-full bg-gray-300 dark:bg-gray-600 flex items-center justify-center">
