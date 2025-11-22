@@ -82,38 +82,37 @@ const ChatInterface = () => {
   
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-  const [shouldAutoScroll, setShouldAutoScroll] = useState(true);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const chatContainerRef = useRef<HTMLDivElement>(null);
   const currentBotMessage = useRef('');
   const abortControllerRef = useRef<AbortController | null>(null);
   const streamComplete = useRef<boolean>(false);
+  const userHasScrolledUp = useRef(false);
+  const isAutoScrolling = useRef(false);
 
   const scrollToBottom = useCallback(() => {
-    if (shouldAutoScroll && messagesEndRef.current) {
+    if (!userHasScrolledUp.current && messagesEndRef.current && !isAutoScrolling.current) {
+      isAutoScrolling.current = true;
       messagesEndRef.current.scrollIntoView({ behavior: 'instant' });
+      // Reset flag after a short delay
+      setTimeout(() => {
+        isAutoScrolling.current = false;
+      }, 50);
     }
-  }, [shouldAutoScroll]);
+  }, []);
 
   const handleScroll = useCallback(() => {
-    if (!chatContainerRef.current) return;
+    if (!chatContainerRef.current || isAutoScrolling.current) return;
 
     const { scrollTop, scrollHeight, clientHeight } = chatContainerRef.current;
     const distanceFromBottom = scrollHeight - (scrollTop + clientHeight);
-    const isNearBottom = distanceFromBottom < 50;
 
-    // Only update if there's a meaningful change
-    if (isNearBottom !== shouldAutoScroll) {
-      setShouldAutoScroll(isNearBottom);
-    }
-  }, [shouldAutoScroll]);
+    // User has scrolled up if they're more than 100px from bottom
+    userHasScrolledUp.current = distanceFromBottom > 100;
+  }, []);
 
   useEffect(() => {
-    // Use RAF to avoid blocking the main thread
-    const rafId = requestAnimationFrame(() => {
-      scrollToBottom();
-    });
-    return () => cancelAnimationFrame(rafId);
+    scrollToBottom();
   }, [messages, scrollToBottom]);
 
   useEffect(() => {
@@ -220,6 +219,9 @@ const ChatInterface = () => {
     if (!input.trim() || isLoading) return;
 
     cleanupStream();
+
+    // Reset scroll flag when user sends a message
+    userHasScrolledUp.current = false;
 
     const userMessage: MessageType = {
       id: Date.now().toString(),
