@@ -89,20 +89,26 @@ const ChatInterface = () => {
   const streamComplete = useRef<boolean>(false);
   const userHasScrolledUp = useRef(false);
   const lastScrollTime = useRef<number>(0);
+  const programmaticScroll = useRef(false);
 
   const scrollToBottom = useCallback(() => {
     const now = Date.now();
     // During streaming, only scroll every 200ms max, and only if user hasn't scrolled up
-    if (!userHasScrolledUp.current && messagesEndRef.current) {
+    if (!userHasScrolledUp.current && messagesEndRef.current && chatContainerRef.current) {
       if (now - lastScrollTime.current > 200) {
         lastScrollTime.current = now;
-        messagesEndRef.current.scrollIntoView({ behavior: 'instant', block: 'end' });
+        programmaticScroll.current = true;
+        chatContainerRef.current.scrollTop = chatContainerRef.current.scrollHeight;
+        setTimeout(() => {
+          programmaticScroll.current = false;
+        }, 100);
       }
     }
   }, []);
 
   const handleScroll = useCallback(() => {
-    if (!chatContainerRef.current) return;
+    // Ignore programmatic scrolls
+    if (programmaticScroll.current || !chatContainerRef.current) return;
 
     const { scrollTop, scrollHeight, clientHeight } = chatContainerRef.current;
     const distanceFromBottom = scrollHeight - (scrollTop + clientHeight);
