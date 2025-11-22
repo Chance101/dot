@@ -90,30 +90,37 @@ const ChatInterface = () => {
   const streamComplete = useRef<boolean>(false);
 
   const scrollToBottom = useCallback(() => {
-    if (shouldAutoScroll) {
-      requestAnimationFrame(() => {
-        messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-      });
+    if (shouldAutoScroll && messagesEndRef.current) {
+      messagesEndRef.current.scrollIntoView({ behavior: 'instant' });
     }
   }, [shouldAutoScroll]);
 
   const handleScroll = useCallback(() => {
     if (!chatContainerRef.current) return;
-    
+
     const { scrollTop, scrollHeight, clientHeight } = chatContainerRef.current;
-    const isNearBottom = scrollHeight - (scrollTop + clientHeight) < 100;
-    
-    setShouldAutoScroll(isNearBottom);
-  }, []);
+    const distanceFromBottom = scrollHeight - (scrollTop + clientHeight);
+    const isNearBottom = distanceFromBottom < 50;
+
+    // Only update if there's a meaningful change
+    if (isNearBottom !== shouldAutoScroll) {
+      setShouldAutoScroll(isNearBottom);
+    }
+  }, [shouldAutoScroll]);
 
   useEffect(() => {
-    scrollToBottom();
+    // Use RAF to avoid blocking the main thread
+    const rafId = requestAnimationFrame(() => {
+      scrollToBottom();
+    });
+    return () => cancelAnimationFrame(rafId);
   }, [messages, scrollToBottom]);
 
   useEffect(() => {
     const chatContainer = chatContainerRef.current;
     if (chatContainer) {
-      chatContainer.addEventListener('scroll', handleScroll);
+      // Use passive listener for better scroll performance
+      chatContainer.addEventListener('scroll', handleScroll, { passive: true });
       return () => chatContainer.removeEventListener('scroll', handleScroll);
     }
   }, [handleScroll]);
