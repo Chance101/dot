@@ -88,27 +88,32 @@ const ChatInterface = () => {
   const abortControllerRef = useRef<AbortController | null>(null);
   const streamComplete = useRef<boolean>(false);
   const userHasScrolledUp = useRef(false);
-  const isAutoScrolling = useRef(false);
+  const lastScrollTime = useRef<number>(0);
 
   const scrollToBottom = useCallback(() => {
-    if (!userHasScrolledUp.current && messagesEndRef.current && !isAutoScrolling.current) {
-      isAutoScrolling.current = true;
-      messagesEndRef.current.scrollIntoView({ behavior: 'instant' });
-      // Reset flag after a short delay
-      setTimeout(() => {
-        isAutoScrolling.current = false;
-      }, 50);
+    const now = Date.now();
+    // During streaming, only scroll every 200ms max, and only if user hasn't scrolled up
+    if (!userHasScrolledUp.current && messagesEndRef.current) {
+      if (now - lastScrollTime.current > 200) {
+        lastScrollTime.current = now;
+        messagesEndRef.current.scrollIntoView({ behavior: 'instant', block: 'end' });
+      }
     }
   }, []);
 
   const handleScroll = useCallback(() => {
-    if (!chatContainerRef.current || isAutoScrolling.current) return;
+    if (!chatContainerRef.current) return;
 
     const { scrollTop, scrollHeight, clientHeight } = chatContainerRef.current;
     const distanceFromBottom = scrollHeight - (scrollTop + clientHeight);
 
-    // User has scrolled up if they're more than 100px from bottom
-    userHasScrolledUp.current = distanceFromBottom > 100;
+    // User has scrolled up if they're more than 150px from bottom
+    if (distanceFromBottom > 150) {
+      userHasScrolledUp.current = true;
+    } else if (distanceFromBottom < 50) {
+      // Reset if user scrolls back to near bottom
+      userHasScrolledUp.current = false;
+    }
   }, []);
 
   useEffect(() => {
@@ -267,9 +272,10 @@ const ChatInterface = () => {
   return (
     <div className="w-full max-w-2xl mx-auto p-4">
       <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg">
-        <div 
+        <div
           ref={chatContainerRef}
-          className="h-96 overflow-y-auto p-4 scroll-smooth"
+          className="h-96 overflow-y-auto p-4"
+          style={{ scrollBehavior: 'auto' }}
         >
           {messages.map((message) => (
             <div
