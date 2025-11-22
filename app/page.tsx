@@ -59,6 +59,9 @@ export default function Home() {
             Ask my AI assistant anything about my experience, skills, or projects
           </p>
           <ChatInterface />
+          <p className="text-center text-xs text-gray-500 dark:text-gray-500 mt-4">
+            Vibe-coded January to March 2025 with Sonnet 3.5, last 1% completed with Sonnet 3.7 & Claude Code beta (March 2025), updated with Claude Code for web beta (November 2025)
+          </p>
         </div>
       </section>
 
