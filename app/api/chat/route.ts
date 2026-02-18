@@ -5,8 +5,6 @@ import { getBlogPosts } from '@/services/wordpress';
 import { importantLinks } from '@/data';
 import { resumeData } from '@/data/fallback';
 
-export const runtime = 'edge';
-
 // Safely access API key
 const apiKey = process.env.ANTHROPIC_API_KEY || '';
 
