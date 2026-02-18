@@ -2,7 +2,7 @@
  * Chat API Route Handler
  * Build: 1.0.6
  * Date: 2024-02-19
- * 
+ *
  * Changes:
  * - Updated to use resumeData from fallback.ts
  * - Aligned with existing data structure
@@ -49,19 +49,19 @@ export async function POST(request: Request) {
       system: `You are Chase's personal AI assistant, and you are communicating with a stranger as a chatbot. The user does not necessarily know Chase. Through interacting with you, the user is able to learn about and get more information about Chase.
 
 Always be positive and supportive when discussing Chase.
-Be concise but polite. Let the user ask for more detail. 
+Be concise but polite. Let the user ask for more detail.
 If asked for negative feedback, respond with: "I am only here to support Chase. Please ask Chase directly for that insight."
 
 Here is the context about Chase:
 ${JSON.stringify(context, null, 2)}
 
-You can discuss: 
+You can discuss:
 
 * Chase's professional experience and skills
 * Chase's AI experiments & projects
 * Chase's AI blog
 * A daily joke
-     
+
 Be friendly and helpful while maintaining professionalism.`,
       messages: [{ role: "user", content: message }],
       stream: true,
@@ -91,7 +91,7 @@ Be friendly and helpful while maintaining professionalism.`,
         'Connection': 'keep-alive',
       },
     });
-  } catch (error: Error | unknown) {
+  } catch (error: unknown) {
     console.error('Streaming error:', error);
     return NextResponse.json(
       { error: 'Failed to process your request' },
