@@ -181,7 +181,12 @@ const ChatInterface = () => {
   const handleSend = async () => {
     if (!input.trim() || isLoading) return;
 
-    cleanupStream();
+    // Abort any previous in-flight request without resetting loading state
+    if (abortControllerRef.current) {
+      abortControllerRef.current.abort();
+      abortControllerRef.current = null;
+    }
+    streamComplete.current = false;
 
     const userMessage: MessageType = {
       id: Date.now().toString(),
