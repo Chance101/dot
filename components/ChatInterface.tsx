@@ -4,7 +4,7 @@ import React, { useReducer, useRef, useEffect, useState, useCallback } from 'rea
 import { Send, User, Bot } from 'lucide-react';
 import { MessageType } from '../types/chat';
 
-type MessageAction =
+type MessageAction = 
   | { type: 'ADD_MESSAGE'; message: MessageType }
   | { type: 'APPEND_TO_LAST_MESSAGE'; content: string };
 
@@ -24,12 +24,10 @@ function messageReducer(state: MessageType[], action: MessageAction): MessageTyp
   }
 }
 
-const FormatMessageContent = React.memo(function FormatMessageContent({ content }: { content: string }) {
-  return content.split('\n\n').map((paragraph, index) => (
-    <p key={index} className={index > 0 ? 'mt-4' : ''}>
-      {paragraph}
-    </p>
-  ));
+import MessageFormatter from './MessageFormatter';
+
+const FormatMessageContent = React.memo(({ content }: { content: string }) => {
+  return <MessageFormatter content={content} />;
 });
 
 FormatMessageContent.displayName = 'FormatMessageContent';
@@ -41,7 +39,7 @@ const ChatInterface = () => {
     content: "Hi! I'm Dot. And I'm Chase's AI bot. How may I assist you today?",
     timestamp: new Date()
   }]);
-
+  
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [shouldAutoScroll, setShouldAutoScroll] = useState(true);
@@ -61,10 +59,10 @@ const ChatInterface = () => {
 
   const handleScroll = useCallback(() => {
     if (!chatContainerRef.current) return;
-
+    
     const { scrollTop, scrollHeight, clientHeight } = chatContainerRef.current;
     const isNearBottom = scrollHeight - (scrollTop + clientHeight) < 100;
-
+    
     setShouldAutoScroll(isNearBottom);
   }, []);
 
@@ -98,11 +96,11 @@ const ChatInterface = () => {
   const getBotResponse = async (input: string): Promise<void> => {
     streamComplete.current = false;
     abortControllerRef.current = new AbortController();
-
+    
     try {
       const response = await fetch('/api/chat', {
         method: 'POST',
-        headers: {
+        headers: { 
           'Content-Type': 'application/json',
           'Cache-Control': 'no-cache',
           'Connection': 'keep-alive',
@@ -111,11 +109,19 @@ const ChatInterface = () => {
         signal: abortControllerRef.current.signal
       });
 
-      if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+      if (!response.ok) {
+        // Try to get error message from response
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(
+          errorData.message || errorData.error || `HTTP error! status: ${response.status}`
+        );
+      }
+      
       if (!response.body) throw new Error('No response body available');
 
       const reader = response.body.getReader();
       const decoder = new TextDecoder('utf-8');
+      let fullText = '';
 
       while (!streamComplete.current) {
         const { done, value } = await reader.read();
@@ -126,9 +132,15 @@ const ChatInterface = () => {
         }
 
         const chunk = decoder.decode(value, { stream: true });
-
+        fullText += chunk;
+        
         // Check for the end marker
         if (chunk.includes('[DONE]')) {
+          // Don't append [DONE] to the displayed message
+          dispatch({
+            type: 'APPEND_TO_LAST_MESSAGE',
+            content: chunk.replace('[DONE]', '')
+          });
           streamComplete.current = true;
           break;
         }
@@ -136,7 +148,7 @@ const ChatInterface = () => {
         if (chunk.trim()) {
           dispatch({
             type: 'APPEND_TO_LAST_MESSAGE',
-            content: chunk.replace('[DONE]', '')
+            content: chunk
           });
         }
       }
@@ -153,7 +165,13 @@ const ChatInterface = () => {
         }
         console.error('Error in getBotResponse:', err);
       }
-      throw err;
+      
+      // Return error message to be displayed to user instead of throwing
+      const errorMessage = err instanceof Error ? err.message : 'An unknown error occurred';
+      dispatch({
+        type: 'APPEND_TO_LAST_MESSAGE',
+        content: `\n\nError: ${errorMessage}. Please try again or check that your API key is valid.`
+      });
     } finally {
       streamComplete.current = true;
       setIsLoading(false);
@@ -206,7 +224,7 @@ const ChatInterface = () => {
   return (
     <div className="w-full max-w-2xl mx-auto p-4">
       <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg">
-        <div
+        <div 
           ref={chatContainerRef}
           className="h-96 overflow-y-auto p-4 scroll-smooth"
         >
@@ -248,14 +266,14 @@ const ChatInterface = () => {
               onChange={(e) => setInput(e.target.value)}
               onKeyPress={(e) => e.key === 'Enter' && handleSend()}
               placeholder="Ask me anything..."
-              className="flex-1 p-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500
+              className="flex-1 p-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 
                 dark:bg-gray-700 dark:text-gray-100 dark:border-gray-600 dark:placeholder-gray-400"
               disabled={isLoading}
             />
             <button
               onClick={handleSend}
               disabled={isLoading}
-              className="bg-blue-500 text-white p-2 rounded-lg hover:bg-blue-600 transition-colors
+              className="bg-blue-500 text-white p-2 rounded-lg hover:bg-blue-600 transition-colors 
                 disabled:bg-blue-300 dark:disabled:bg-blue-400"
             >
               <Send className="w-5 h-5" />

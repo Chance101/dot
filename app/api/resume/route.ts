@@ -1,11 +1,11 @@
 // app/api/resume/route.ts
 import { NextResponse } from 'next/server';
-import { getResume } from '@/services/googleDocs';
+import { resumeData } from '@/data/fallback';
 
 export async function GET() {
   try {
-    const resume = await getResume();
-    return NextResponse.json({ resume });
+    // Simply return the static resume data
+    return NextResponse.json({ resume: resumeData });
   } catch (error) {
     console.error('Resume fetch error:', error);
     return NextResponse.json(

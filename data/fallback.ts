@@ -2,9 +2,8 @@
 
 export const resumeData = {
   personalInfo: {
-    name: "Chase R. Hitchens",
+    name: "Chase Hitchens",
     location: "Austin, TX",
-    phone: "(512) 888-1150",
     email: "Chase.Hitchens@gmail.com",
     linkedin: "LinkedIn" // Add your actual LinkedIn URL in links.ts
   },
@@ -13,7 +12,7 @@ export const resumeData = {
 
   skills: [
     "Full-Cycle Sales",
-     "Pipeline Management",
+    "Pipeline Management",
     "Cross-Team Collaboration",
     "Customer Success",
     "the Customer Journey",
@@ -27,6 +26,8 @@ export const resumeData = {
     "Adaptable",
     "Positive Energy",
 	"AI",
+    "API",
+    "LLMs",
 	"Building with AI",
 	"Chatbots",
 	"Curious",
@@ -66,7 +67,8 @@ export const resumeData = {
       period: "March 2018 - February 2023",
       achievements: [
         "Built a direct-to-consumer (DTC) Consumer Packaged Goods (CPG) matcha tea company.",
-        "Drove sales through targeted paid ad campaigns, email marketing, content creation, and full-funnel optimization, achieving customer conversion and retention."
+        "Drove sales through targeted paid ad campaigns, email marketing, content creation, and full-funnel marketing and sales, achieving customer conversion and retention.",
+        "In 2018, lived in Japan to study Japanese tea production at the source, learning directly from tea masters, farmers, and producers while building relationships with tea traders throughout Japan in preparation for launching the business."
       ]
     },
     {
@@ -79,7 +81,7 @@ export const resumeData = {
           achievements: [
             "Partnered with Corporate HR & C-suite executives to implement employee wellness programs, utilizing Jawbone's Up (hardware) devices and the Up for Groups (SaaS) solution.",
             "Built a full-cycle sales pipeline, leveraging Salesforce for CRM & revenue management.",
-            "Exceeded all quarterly sales quotas, securing large-scale client partnerships (e.g., Johnson & Johnson, 10K units in 2016).",
+            "Exceeded quarterly sales quotas, securing large-scale client partnerships (e.g., Johnson & Johnson, 10K units in 2016).",
             "Collaborated with Product, Operations, and Finance teams to tailor offerings and gather customer feedback for future Product Roadmap opportunities."
           ]
         },
@@ -102,7 +104,7 @@ export const resumeData = {
           location: "Chicago, IL",
           period: "March 2013 - August 2015",
           achievements: [
-            "Achieved record sales of $35M in 2014 (111% of target) and $31M in 2013 (106% of target).",
+            "Achieved record sales of $35M in 2014 (111% to target) and $31M in 2013 (106% to target).",
             "Increased customer profitability by 2% in 2014, adding $1.2 million incremental margin.",
             "Awarded GE Presidents Club Sales & Leadership Award for Execution & Top Performance."
           ]
@@ -169,8 +171,9 @@ export const resumeData = {
     "Japanese Tea",
     "Cooking",
     "Health & Wellness",
-    "Exploring different cultures (visited 37 countries)",
+    "Traveling and exploring different cultures (37 countries visited)",
     "Learning languages (Spanish & Japanese)",
-    "Consumer tech"
+    "Consumer tech",
+    "AI"
   ]
 };

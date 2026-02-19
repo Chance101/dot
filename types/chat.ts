@@ -4,4 +4,5 @@ export type MessageType = {
   type: 'user' | 'bot';
   content: string;
   timestamp: Date;
-}
+  isError?: boolean; // Added this property to support error handling
+};
