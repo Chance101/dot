@@ -2,22 +2,33 @@
 
 export const resumeData = {
   personalInfo: {
-    name: "Chase Hitchens",
+    name: "Chase R. Hitchens",
     location: "Austin, TX",
-    email: "Chase.Hitchens@gmail.com",
-    linkedin: "LinkedIn" // Add your actual LinkedIn URL in links.ts
+    email: "chase.r.hitchens@gmail.com",
+    tagline: "Tea Farm Intern → AI Community Champion | Enterprise Sales (GE, Jawbone) | 2x Presidents Club | Curious About Everything"
   },
 
-  summary: `Chase is a business leader, a customer success advocate, a manager of people, an entrepreneur, has a rapidly growing expertise in AI -- pushing the boundaries of LLMs and leveraging AI to build utility, and is a tech lover (consumer health tech). He has over 15 years of professional experience having worked for companies like General Electric (GE), Jawbone (tech), Whole Foods Market, and as a founder of his own company, Matcha Project.`,
+  summary: `Anything but ordinary. Curiosity has driven Chase's 17-year professional journey across enterprise sales, wearable tech + corporate wellness, a tea farm internship in Japan, entrepreneurship, and now cultural leadership and AI community building. What connects it all: understanding what people actually need and helping them get there.
+
+In late 2022, Chase used ChatGPT for the first time to create a funny story with his nephews. Fast forward to November 2024: a friend challenged him to go deeper with AI. This led him to download Claude and create an in-depth business plan in minutes. Curious to explore deeper, he began a "5 mins of AI" daily practice, which quickly ballooned into hours at a time. The first time he saw Claude write code, his mind started racing: the possibilities were endless. What followed: 50+ hours building a "resume chatbot" named Dot leveraging Claude API; joining the Claude Code beta program; building workflow automations using n8n; building an agent-run event calendar for the Austin AI Community; and hosting AICamp ATX's December meetup with 50+ attendees. What started as curious experimentation has led to a deeper purpose: being able to bridge the gap between non-technical business leaders and technical development teams.`,
+
+  topSkills: [
+    "Enterprise Sales",
+    "Generative AI",
+    "Customer Success"
+  ],
 
   skills: [
+    "Enterprise Sales",
+    "Generative AI",
+    "Customer Success",
+    "People Leadership",
     "Full-Cycle Sales",
     "Pipeline Management",
     "Cross-Team Collaboration",
-    "Customer Success",
     "the Customer Journey",
-	"Customer Service",
-	"Customer Experience",
+    "Customer Service",
+    "Customer Experience",
     "Salesforce CRM",
     "High EQ",
     "Proactive Learner & Tinkerer",
@@ -25,130 +36,193 @@ export const resumeData = {
     "Creative & Outside of the Box Thinker",
     "Adaptable",
     "Positive Energy",
-	"AI",
-    "API",
+    "AI",
     "LLMs",
-	"Building with AI",
-	"Chatbots",
-	"Curious",
-	"People Management",
-	"Sales",
-	"Marketing",
-	"Merchandising"
-	
+    "Building with AI",
+    "Claude API",
+    "Claude Code",
+    "n8n Workflow Automations",
+    "Chatbots",
+    "Curious",
+    "Sales",
+    "Marketing",
+    "Merchandising"
+  ],
+
+  certifications: [
+    "Future of AI",
+    "Six Sigma Green Belt",
+    "Generative AI for Business Leaders",
+    "AI Fluency: Framework & Foundations",
+    "Generative AI: Building an AI-First Mindset",
+    "Advanced Culture Champion Certification (Whole Foods Market)"
   ],
 
   experience: [
     {
       company: "Whole Foods Market",
+      totalTenure: "3 years 11 months",
       roles: [
         {
-          title: "Customer Service & Ecommerce Manager",
-          location: "Chicago, IL & Austin, TX",
-          period: "Sep 2023 - Present",
+          title: "Culture Champion Ambassador + Customer Service Supervisor",
+          location: "Austin, TX",
+          period: "August 2024 - Present",
           achievements: [
-            "Manage and coach 40+ team members on providing an exceptional customer experience."
+            "Manages daily Customer Service operations for a team of 15 while serving as the Store Leadership appointed Culture Champion Ambassador.",
+            "Engages 150+ team members across all teams, helping create an environment where team members feel welcome, seen, and supported, while connecting them to Whole Foods Market's mission and purpose.",
+            "In 2025, successfully executed 2 volunteer events supporting local Austin non-profits, drove the highest team member participation rate across all Metro Austin stores in quarterly charitable Store Giving votes (top 8 across 100+ stores in region).",
+            "Hosted multiple team member activation events as the HQ conduit sharing details of Apprenticeship programs, Annual Culture Survey feedback, and Local supplier programs."
           ]
         },
         {
-          title: "Team Member & Culture Champion",
+          title: "Customer Service Supervisor + Green Mission Ambassador",
+          location: "Chicago, IL",
+          period: "September 2023 - August 2024",
+          achievements: [
+            "Led a customer service team of 40+ team members, stepping into formal people leadership for the first time.",
+            "Built intentional relationships with team, becoming a trusted leader team members would come to with problems or for help.",
+            "Asked by direct manager to lead a group of 8 senior team members, coaching them, offering feedback, and helping them grow.",
+            "Earned Advanced Culture Champion Certification and was asked by Store Leadership to take on the Green Mission Ambassador role."
+          ]
+        },
+        {
+          title: "Team Member + Culture Champion",
           location: "Chicago, IL",
           period: "April 2022 - August 2023",
           achievements: [
-            "Joined Whole Foods Market to study Consumer Packaged Goods (CPG) products in-channel."
+            "Joined Whole Foods Market with curiosity to study CPG in a retail environment at a company admired as a customer for 15+ years.",
+            "Spoke to 1000s of customers weekly and discovered Whole Foods Market's recipe for success: company culture and Conscious Capitalism.",
+            "Raised hand to become a certified Culture Champion, leading to Store Leadership asking him to represent his team in a store-wide Culture Action Committee."
           ]
         }
       ]
     },
     {
       company: "Matcha Project",
-      role: "Founder",
+      role: "Founder & Operator",
       location: "Remote",
-      period: "March 2018 - February 2023",
+      period: "February 2019 - February 2023",
       achievements: [
-        "Built a direct-to-consumer (DTC) Consumer Packaged Goods (CPG) matcha tea company.",
-        "Drove sales through targeted paid ad campaigns, email marketing, content creation, and full-funnel marketing and sales, achieving customer conversion and retention.",
-        "In 2018, lived in Japan to study Japanese tea production at the source, learning directly from tea masters, farmers, and producers while building relationships with tea traders throughout Japan in preparation for launching the business."
+        "Created a direct-sourced premium organic Japanese matcha tea CPG company selling direct-to-consumer through ecommerce.",
+        "Learned paid ads, email marketing, customer journey optimization, building sales and marketing funnels, and leveraging automation to convert cold paid traffic into repeat sales.",
+        "Went from idea to execution over four years, wearing every hat while leaving space to evolve along the way.",
+        "Pivoted to a subscription model, increasing customer LTV 8.5x, from $57 to $487.",
+        "Born from a tea farm internship in Japan and a belief that Americans were over-caffeinated, combined with a desire to support an industry and culture he loved."
+      ]
+    },
+    {
+      company: "Kyoto Obubu Tea Farms",
+      role: "Volunteer Intern",
+      location: "Wazuka, Kyoto Prefecture, Japan",
+      period: "March 2018 - June 2018",
+      achievements: [
+        "Immersed in tea production from the fields to the cup, working alongside farmers, helping process and finish tea in the factory.",
+        "Hosted tea tours with international guests and earned full factory access to produce experimental black teas from scratch.",
+        "Synthesized Japanese tea production methods with techniques previously observed in Darjeeling, India.",
+        "Learned common and polite Japanese phrases, practiced social customs and etiquette, and worked to bridge cultural barriers."
       ]
     },
     {
       company: "Jawbone",
+      totalTenure: "1 year 7 months",
       roles: [
         {
-          title: "Account Executive - Corporate Wellness",
-          location: "Remote",
+          title: "Corporate Wellness Enterprise Sales Manager & Business Development",
+          location: "San Francisco, CA",
           period: "October 2015 - February 2017",
           achievements: [
-            "Partnered with Corporate HR & C-suite executives to implement employee wellness programs, utilizing Jawbone's Up (hardware) devices and the Up for Groups (SaaS) solution.",
-            "Built a full-cycle sales pipeline, leveraging Salesforce for CRM & revenue management.",
-            "Exceeded quarterly sales quotas, securing large-scale client partnerships (e.g., Johnson & Johnson, 10K units in 2016).",
-            "Collaborated with Product, Operations, and Finance teams to tailor offerings and gather customer feedback for future Product Roadmap opportunities."
+            "Championed a technology platform (SaaS + hardware) to enterprise customers to positively impact health and wellness of large employee populations.",
+            "Partnered with HR and C-suite executives across SMBs, Mid Market, and Enterprise, owning the entire sales process.",
+            "Exceeded quarterly sales quotas while delivering business value.",
+            "Helped launch a global pilot program for Johnson & Johnson across 25 countries, resulting in $500K in revenue while directly impacting more than 10,000 lives.",
+            "Served as voice of the customer, actively seeking feedback and sharing it with the Product team to inform the roadmap."
           ]
         },
         {
           title: "National Account Manager",
-          location: "Remote",
+          location: "San Francisco, CA",
           period: "August 2015 - October 2015",
           achievements: [
-            "Managed Walmart, Verizon, AT&T, T-Mobile, and Sprint National Accounts.",
-            "Pivoted to the Corporate Wellness Team as Jawbone's go-to-market strategy shifted away from all Retail channels and the team was dissolved."
+            "After nearly 8 years at GE, curiosity about the startup environment and consumer health technology led to joining Jawbone.",
+            "Managed key National Accounts: Walmart, Verizon, AT&T, T-Mobile, and Sprint.",
+            "Pivoted to the Corporate Wellness team after 3 months when company strategy shifted."
           ]
         }
       ]
     },
     {
-      company: "General Electric Co. (GE Appliances)",
+      company: "General Electric (GE Appliances)",
+      totalTenure: "7 years 7 months",
       roles: [
         {
           title: "Key Account Manager",
           location: "Chicago, IL",
-          period: "March 2013 - August 2015",
+          period: "March 2013 - July 2015",
           achievements: [
-            "Achieved record sales of $35M in 2014 (111% to target) and $31M in 2013 (106% to target).",
-            "Increased customer profitability by 2% in 2014, adding $1.2 million incremental margin.",
-            "Awarded GE Presidents Club Sales & Leadership Award for Execution & Top Performance."
+            "Promoted to become the youngest Key Account Manager in the business, taking on an 8-figure revenue target and a $1 million P&L.",
+            "Built relationships at every level up to the CEO, learning to influence without authority across cross-functional teams.",
+            "Grew business to record levels: 106% year one, 111% year two ($35M in 2014, $31M in 2013) while improving profitability.",
+            "Won the President's Club Award and was invited to join GE Chairman and CEO at a Chicago Roundtable.",
+            "Increased customer profitability by 2% in 2014, adding $1.2 million incremental margin."
           ]
         },
         {
-          title: "Sales Account Manager",
+          title: "Area Sales Manager",
           location: "Miami, FL",
-          period: "January 2012 - February 2013",
+          period: "January 2012 - March 2013",
           achievements: [
-            "Grew account portfolio sales by 400%, winning GE's Leadership Award for Top Performance."
+            "Promoted to Sales Manager in the Miami Market with full territory ownership and ability to hunt for new business.",
+            "Opened 3 new customers in 2012 adding $750K in new revenue and 400% growth to independent customer portfolio.",
+            "Won GE Leadership Award for Top Performance and was selected (1 of 6 in entire sales org) for a multi-day leadership event with VP of Sales.",
+            "This event directly opened the door for managing GE's largest Key Account customer relationship."
           ]
         },
         {
-          title: "Merchandising Account Manager",
-          location: "Miami, FL",
+          title: "Area Merchandising Specialist",
+          location: "Miami-Fort Lauderdale Area",
           period: "August 2009 - December 2011",
           achievements: [
-            "Drove $22 million in sales through 100 retail national account locations.",
-            "Trained 1000+ customer salespeople on effectively selling GE competitive advantages.",
-            "Achieved 167% revenue growth at a key store account, growing revenue from ~$600K to $1MM+ to become the most profitable account in the territory.",
-            "Achieved the company's highest market penetration rate at 50%, vs. ~30% average.",
-            "Awarded the GE Excellence Award for Top Performance, Leadership, & Best Practice Sharing."
+            "Called on 75+ retail national account locations, trained several thousand employees, and built hundreds of champions at all levels.",
+            "Achieved one of the highest sales penetration rates at The Home Depot: 52% vs. a 30% company average.",
+            "Drove $22 million in sales and achieved 167% revenue growth at a key store account, from ~$600K to $1MM+.",
+            "Tailored selling message and training materials into Spanish to honor cultural nuance in South Florida market.",
+            "Awarded GE Excellence Award for Top Performance, Leadership, & Best Practice Sharing."
           ]
         },
         {
-          title: "Direct Sales Account Manager",
+          title: "Commercial Training Program & Direct Sales Area Sales Manager",
           location: "Louisville, KY",
-          period: "January 2008 - July 2009",
+          period: "January 2008 - August 2009",
           achievements: [
-            "Managed a portfolio of 100 retail accounts, achieving $10 million in sales revenue.",
-            "Won the 2008 GE Presidents Club Award for Top Performance (108% of target)."
+            "Joined GE's Commercial Training Program fresh out of Purdue, receiving formal training in professional selling, negotiation, presentation skills, and public speaking.",
+            "Managed 100+ accounts across 6 states without face-to-face meetings.",
+            "Achieved 108% of target during the 2008 financial crisis, winning the President's Club Award for top performance."
           ]
         }
       ]
     }
   ],
 
+  aiJourney: {
+    summary: "What started as a curious experiment with ChatGPT in late 2022 has evolved into a deep passion for AI. After a friend's challenge in November 2024, Chase began building with Claude and hasn't looked back.",
+    projects: [
+      "Built 'Dot', a resume chatbot powered by Claude API (50+ hours of development)",
+      "Joined the Claude Code beta program",
+      "Built workflow automations using n8n",
+      "Built an agent-run event calendar for the Austin AI Community",
+      "Hosted AICamp ATX's December meetup with 50+ attendees"
+    ],
+    purpose: "Bridging the gap between non-technical business leaders and technical development teams."
+  },
+
   education: {
-    university: "Purdue University, Krannert School of Business",
+    university: "Purdue University Daniels School of Business",
     location: "West Lafayette, IN",
-    degree: "Bachelor of Science in Business Management",
-    minor: "Marketing",
+    degree: "Bachelor of Science, Business Management & Marketing",
+    period: "2003 - 2007",
+    highSchool: "Carmel High School (1999 - 2003)",
     additionalTraining: [
-      "GE Corporate Training:",
+      "GE Commercial Training Program:",
       "Public Speaking",
       "Professional Negotiation Skills",
       "Presentation Skills",
@@ -159,10 +233,25 @@ export const resumeData = {
     ]
   },
 
+  awards: [
+    "GE Presidents Club Sales & Leadership Award (1 of 3 in entire organization, 2014)",
+    "GE Presidents Club Award (2008)",
+    "GE Leadership Award (1 of 6 selected in entire sales org)",
+    "GE AMS Excellence Award",
+    "GE Global Recognition Award",
+    "Executive Career Development Recognition Award (1 of 6 executives selected)"
+  ],
+
   volunteering: [
-    "Purdue Krannert Student Mentor (2015 - Present)",
+    "AICamp ATX - Volunteer & Meetup Host (October 2025 - Present)",
+    "Purdue Daniels School Student Mentor (2015 - Present)",
     "Startup Kids Club Group Leader (2019)",
-    "Volunteer at Obubu Tea Farms, Kyoto, Japan (2018)"
+    "Volunteer Intern at Obubu Tea Farms, Kyoto, Japan (2018)"
+  ],
+
+  languages: [
+    "English (Native or Bilingual)",
+    "Spanish (Elementary)"
   ],
 
   interests: [
@@ -170,10 +259,10 @@ export const resumeData = {
     "Biking",
     "Japanese Tea",
     "Cooking",
-    "Health & Wellness",
+    "Health & Wellness (food as medicine)",
     "Traveling and exploring different cultures (37 countries visited)",
     "Learning languages (Spanish & Japanese)",
     "Consumer tech",
-    "AI"
+    "AI & LLMs"
   ]
 };
