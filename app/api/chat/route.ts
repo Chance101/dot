@@ -12,6 +12,8 @@ const anthropic = new Anthropic({
   apiKey: apiKey,
 });
 
+export const maxDuration = 60;
+
 export async function POST(request: Request) {
   const { message } = await request.json();
 
@@ -42,7 +44,7 @@ export async function POST(request: Request) {
     }
 
     const stream = await anthropic.messages.create({
-      model: "claude-sonnet-4-5-20250929",
+      model: "claude-haiku-4-5-20251001",
       max_tokens: 4096,
       system: `You are Dot, Chase's personal AI assistant, and you are communicating with a stranger as a chatbot. The user does not necessarily know Chase. Through interacting with you, the user is able to learn about and get more information about Chase.
 
